@@ -1,0 +1,47 @@
+﻿<Window x:Class="MultiRobotSimulator.WPF.Pages.NewFileDialogView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:pages="clr-namespace:MultiRobotSimulator.WPF.Pages"
+        xmlns:s="https://github.com/canton7/Stylet"
+        xmlns:numeric="http://gu.se/NumericInput"
+        mc:Ignorable="d"
+        Title="Create new map" Height="150" Width="260"
+        SizeToContent="WidthAndHeight"
+        ResizeMode="NoResize" WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20" />
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="20" />
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="20" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="20" />
+        </Grid.RowDefinitions>
+
+        <!-- row 1 -->
+        <TextBlock Grid.Column="1" Grid.Row="1">Height</TextBlock>
+        <numeric:SpinnerDecorator Grid.Column="3" Grid.Row="1">
+            <numeric:IntBox MinValue="1" MaxValue="1000" Value="{Binding Height}" AllowSpinners="True" Increment="1" ValidationTrigger="PropertyChanged" CanValueBeNull="False" ValueChanged="{s:Action ValueChanged}" Validation.Error="{s:Action ValidationError}" x:Name="IntBoxHeight" />
+        </numeric:SpinnerDecorator>
+
+        <!-- row 3 -->
+        <TextBlock Grid.Column="1" Grid.Row="3">Width</TextBlock>
+        <numeric:SpinnerDecorator Grid.Column="3" Grid.Row="3">
+            <numeric:IntBox MinValue="1" MaxValue="1000" Value="{Binding Width}" AllowSpinners="True" Increment="1" ValidationTrigger="PropertyChanged" CanValueBeNull="False" ValueChanged="{s:Action ValueChanged}" Validation.Error="{s:Action ValidationError}" x:Name="IntBoxWidth" />
+        </numeric:SpinnerDecorator>
+
+        <!-- row 5 -->
+        <Button Command="{s:Action ClickOK}" Grid.Column="1" Grid.Row="5">OK</Button>
+        <Button Command="{s:Action ClickCancel}" Grid.Column="3" Grid.Row="5">Cancel</Button>
+    </Grid>
+</Window>

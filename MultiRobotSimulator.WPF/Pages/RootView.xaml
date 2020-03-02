@@ -1,0 +1,90 @@
+﻿<Window x:Class="MultiRobotSimulator.WPF.Pages.RootView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MultiRobotSimulator.WPF"
+        xmlns:pages="clr-namespace:MultiRobotSimulator.WPF.Pages"
+        xmlns:s="https://github.com/canton7/Stylet"
+        mc:Ignorable="d"
+        Title="MultiRobotSimulator" Height="450" Width="800"
+        WindowStartupLocation="CenterOwner">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <local:EnumBooleanConverter x:Key="EnumBooleanConverter" />
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" Panel.ZIndex="999">
+            <MenuItem Header="File">
+                <MenuItem Header="New..." Command="{s:Action FileNew}" IsCheckable="False"></MenuItem>
+                <MenuItem Header="Open..." Command="{s:Action FileOpen}" IsCheckable="False"></MenuItem>
+                <MenuItem Header="Save" Command="{s:Action FileSave}" IsEnabled="{Binding HasOpenTabs}" IsCheckable="False"></MenuItem>
+                <MenuItem Header="Save as..." Command="{s:Action FileSaveAs}" IsEnabled="{Binding HasOpenTabs}" IsCheckable="False"></MenuItem>
+            </MenuItem>
+        </Menu>
+        <Grid DockPanel.Dock="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="150"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <!-- COLUMN 0 -->
+            <Grid>
+                <TextBlock Grid.Column="0" Visibility="{Binding HasOpenTabs, Converter={x:Static s:BoolToVisibilityConverter.InverseInstance}}" VerticalAlignment="Center" HorizontalAlignment="Stretch" TextAlignment="Center">
+                    <Hyperlink Click="{s:Action FileNew}">Create new</Hyperlink> or <Hyperlink Click="{s:Action FileOpen}">open existing</Hyperlink> map
+                </TextBlock>
+            </Grid>
+            <Border Grid.Column="0">
+                <TabControl ItemsSource="{Binding Items}" SelectedItem="{Binding ActiveItem}" Visibility="{Binding HasOpenTabs, Converter={x:Static s:BoolToVisibilityConverter.Instance}}">
+                    <TabControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding DisplayName}" ToolTip="{Binding FullPath}" />
+                                <TextBlock Text="*" Visibility="{Binding HasChanges, Converter={x:Static s:BoolToVisibilityConverter.Instance}}" />
+                                <Button Content="×" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Close"
+                                    Padding="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="3 0 0 0" Command="{s:Action TabClose}" CommandParameter="{Binding Id}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </TabControl.ItemTemplate>
+                    <TabControl.ContentTemplate>
+                        <DataTemplate>
+                            <ContentControl s:View.Model="{Binding}" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" IsTabStop="False" />
+                        </DataTemplate>
+                    </TabControl.ContentTemplate>
+                </TabControl>
+            </Border>
+
+            <!-- COLUMN 1 -->
+            <Border Grid.Column="1" BorderThickness="3" BorderBrush="Gray" Width="150" Background="Gray" Panel.ZIndex="999">
+                <TabControl>
+                    <TabItem Header="Editor">
+                        <Border BorderThickness="5" BorderBrush="Transparent">
+                            <WrapPanel Orientation="Vertical" IsEnabled="{Binding HasOpenTabs}">
+                                <Button Command="{s:Action EditorClearAll}">Clear all</Button>
+                                <Border BorderThickness="3" BorderBrush="Transparent" />
+                                <GroupBox Header="Draw">
+                                    <StackPanel>
+                                        <RadioButton IsChecked="{Binding DrawingMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static local:DrawingMode.Obstacle}}" Content="Obstacle" />
+                                        <RadioButton IsChecked="{Binding DrawingMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static local:DrawingMode.Start}}" Content="Start" />
+                                        <RadioButton IsChecked="{Binding DrawingMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static local:DrawingMode.Finish}}" Content="Finish" />
+                                    </StackPanel>
+                                </GroupBox>
+                            </WrapPanel>
+                        </Border>
+                    </TabItem>
+                    <TabItem Header="Algorithms">
+                        <WrapPanel Orientation="Vertical">
+                            <TextBlock>* C#</TextBlock>
+                            <TextBlock>* Python ?</TextBlock>
+                            <TextBlock>* Lua ?</TextBlock>
+                            <TextBlock>* JS ?</TextBlock>
+                        </WrapPanel>
+                    </TabItem>
+                </TabControl>
+            </Border>
+        </Grid>
+    </DockPanel>
+</Window>

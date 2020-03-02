@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MultiRobotSimulator.Core", "MultiRobotSimulator.Core\MultiRobotSimulator.Core.csproj", "{8B013252-3891-44B7-8F92-04378B496FEF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MultiRobotSimulator.WPF", "MultiRobotSimulator.WPF\MultiRobotSimulator.WPF.csproj", "{B3A5FCA6-055D-45BF-AE97-CE37D96A7089}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{30CD7B8C-491F-4289-8FEB-C10A334AB748}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		CHANGELOG.md = CHANGELOG.md
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8B013252-3891-44B7-8F92-04378B496FEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B013252-3891-44B7-8F92-04378B496FEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B013252-3891-44B7-8F92-04378B496FEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B013252-3891-44B7-8F92-04378B496FEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3A5FCA6-055D-45BF-AE97-CE37D96A7089}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3A5FCA6-055D-45BF-AE97-CE37D96A7089}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3A5FCA6-055D-45BF-AE97-CE37D96A7089}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3A5FCA6-055D-45BF-AE97-CE37D96A7089}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8E49E03F-3151-4AAB-9B45-D47B6E59649B}
+	EndGlobalSection
+EndGlobal
