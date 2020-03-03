@@ -3,8 +3,10 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
+using Microsoft.Extensions.Logging;
 using MultiRobotSimulator.WPF.Pages;
 using MultiRobotSimulator.WPF.Services;
+using NLog.Extensions.Logging;
 using Stylet;
 using StyletIoC;
 
@@ -12,8 +14,11 @@ namespace MultiRobotSimulator.WPF
 {
     internal class Bootstrapper : Bootstrapper<RootViewModel>
     {
+        private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
         protected override void Configure()
         {
+            _logger.Debug("Container loaded");
         }
 
         protected override void ConfigureIoC(IStyletIoCBuilder builder)
@@ -23,13 +28,14 @@ namespace MultiRobotSimulator.WPF
             builder.Bind<IIOService>().To<IOService>();
             builder.Bind<IMapService>().To<MapService>();
 
-            //// TODO add logging
-            //builder.Bind<ILoggerFactory>().ToAbstractFactory();
-            //builder.Bind(typeof(ILogger<>)).To(typeof(Logger<>));
+            // logging
+            builder.Bind<ILoggerFactory>().To<NLogLoggerFactory>();
+            builder.Bind(typeof(ILogger<>)).To(typeof(Logger<>));
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
+            _logger.Info("App exit");
         }
 
         protected override void OnLaunch()
@@ -42,6 +48,8 @@ namespace MultiRobotSimulator.WPF
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
             FrameworkElement.LanguageProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(System.Windows.Markup.XmlLanguage.GetLanguage(CultureInfo.InvariantCulture.IetfLanguageTag)));
+
+            _logger.Info("App started");
         }
 
         protected override void OnUnhandledException(DispatcherUnhandledExceptionEventArgs e)
@@ -51,7 +59,7 @@ namespace MultiRobotSimulator.WPF
             if (ex is TargetInvocationException tie && tie.InnerException != null)
                 ex = tie.InnerException;
 
-            //Container.Get<ILogger<App>>().LogCritical(ex, "Unhandled exception");
+            _logger.Fatal(ex, "Unhandled exception");
 
             var msg = ex.Message;
 

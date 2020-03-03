@@ -1,15 +1,22 @@
 ﻿using System;
 using Gu.Wpf.NumericInput;
+using Microsoft.Extensions.Logging;
 using Stylet;
 
 namespace MultiRobotSimulator.WPF.Pages
 {
     public class NewFileDialogViewModel : Screen
     {
+        private readonly ILogger<NewFileDialogViewModel> _logger;
         private int _height;
         private bool _heightValid;
         private int _width;
         private bool _widthValid;
+
+        public NewFileDialogViewModel(ILogger<NewFileDialogViewModel> logger)
+        {
+            _logger = logger;
+        }
 
         public bool CanClickOK => HeightValid && WidthValid;
 
@@ -90,5 +97,21 @@ namespace MultiRobotSimulator.WPF.Pages
                 }
             }
         }
+
+        #region Logging overrides
+
+        protected override bool SetAndNotify<T>(ref T field, T value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+        {
+            var result = base.SetAndNotify(ref field, value, propertyName);
+
+            if (result)
+            {
+                _logger?.LogTrace("Property '{propertyName}' new value: '{value}'", propertyName, value);
+            }
+
+            return result;
+        }
+
+        #endregion Logging overrides
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Windows;
+using Microsoft.Extensions.Logging;
 using MultiRobotSimulator.Core.Models;
 using Stylet;
 
@@ -8,12 +9,14 @@ namespace MultiRobotSimulator.WPF.Pages
 {
     public class EditorTabViewModel : Screen
     {
+        private readonly ILogger<EditorTabViewModel> _logger;
         private string _fullPath = string.Empty;
         private bool _hasChanges;
         private Map? _map;
 
-        public EditorTabViewModel()
+        public EditorTabViewModel(ILogger<EditorTabViewModel> logger)
         {
+            _logger = logger;
             EditorCanvas = new EditorCanvasViewModel(this);
         }
 
@@ -62,5 +65,21 @@ namespace MultiRobotSimulator.WPF.Pages
                 EditorCanvas.ResizeEventHandler.Invoke(sender, e);
             }
         }
+
+        #region Logging overrides
+
+        protected override bool SetAndNotify<T>(ref T field, T value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+        {
+            var result = base.SetAndNotify(ref field, value, propertyName);
+
+            if (result)
+            {
+                _logger?.LogTrace("Property '{propertyName}' new value: '{value}'", propertyName, value);
+            }
+
+            return result;
+        }
+
+        #endregion Logging overrides
     }
 }

@@ -9,9 +9,10 @@ Code for diploma thesis *Path planning for multiple robots*.
   - [ ] Multiple robots to single target
   - [ ] Multiple robots to multiple targets
 - [x] Support for saving/loading `.map` files ([MovingAI](https://www.movingai.com/benchmarks/formats.html))
-- [ ] Logging
-- [ ] Benchmarking
+- [x] Logging
 - [ ] Tests
+- [ ] Documentation
+- [ ] Benchmarking
 - Support for algorithms as external plugins
   - [ ] [dotnet](https://docs.microsoft.com/en-us/dotnet/core/tutorials/creating-app-with-plugin-support)
   - [ ] [Python](https://stackoverflow.com/a/53612533)

@@ -5,16 +5,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## TODO
-- Logging - [Serilog?](https://github.com/serilog/serilog), [NLog?](https://nlog-project.org/)
 - Algorithms as plugins
     - [dotnet](https://docs.microsoft.com/en-us/dotnet/core/tutorials/creating-app-with-plugin-support)
     - [Python?](https://stackoverflow.com/a/53612533)
     - [Lua?](https://www.moonsharp.org/)
     - [JavaScript?](https://github.com/Microsoft/ClearScript)
-
+- Tests
+- Documentation
+- Benchmarks
 
 ## [Unreleased]
 ### Added
+- Logging - [NLog](https://nlog-project.org/)
 
 ### Changed
 

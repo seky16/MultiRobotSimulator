@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Microsoft.Extensions.Logging;
 using MultiRobotSimulator.Core.Models;
 using MultiRobotSimulator.WPF.Events;
 using Stylet;
@@ -14,14 +15,16 @@ namespace MultiRobotSimulator.WPF.Pages
     public partial class EditorCanvasView : UserControl, IHandle<CanvasRedrawEvent>
     {
         private readonly DrawingGroup _backingStore = new DrawingGroup();
+        private readonly ILogger<EditorCanvasView> _logger;
         private readonly Typeface _typeface = new Typeface("Arial");
         private EditorTabViewModel? _tab;
 
-        public EditorCanvasView(IEventAggregator eventAggregator)
+        public EditorCanvasView(IEventAggregator eventAggregator, ILogger<EditorCanvasView> logger)
         {
             DataContextChanged += OnDataContextChanged;
 
             eventAggregator.Subscribe(this);
+            _logger = logger;
         }
 
         public double CellSize { get; private set; }
@@ -204,6 +207,8 @@ namespace MultiRobotSimulator.WPF.Pages
 
         private void SetCanvasSize(Size size)
         {
+            _logger.LogDebug("SetCanvasSize: {size}", size);
+
             // Map wasn't set yet - nothing to render
             if (_tab?.Map is null)
             {
