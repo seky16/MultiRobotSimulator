@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MultiRobotSimulator.WPF"
+        xmlns:enums="clr-namespace:MultiRobotSimulator.Core.Enums;assembly=MultiRobotSimulator.Core"
         xmlns:pages="clr-namespace:MultiRobotSimulator.WPF.Pages"
         xmlns:s="https://github.com/canton7/Stylet"
         mc:Ignorable="d"
@@ -67,9 +68,9 @@
                                 <Border BorderThickness="3" BorderBrush="Transparent" />
                                 <GroupBox Header="Draw">
                                     <StackPanel>
-                                        <RadioButton IsChecked="{Binding DrawingMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static local:DrawingMode.Obstacle}}" Content="Obstacle" />
-                                        <RadioButton IsChecked="{Binding DrawingMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static local:DrawingMode.Start}}" Content="Start" />
-                                        <RadioButton IsChecked="{Binding DrawingMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static local:DrawingMode.Finish}}" Content="Finish" />
+                                        <RadioButton IsChecked="{Binding DrawingMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static enums:DrawingMode.Obstacle}}" Content="Obstacle" />
+                                        <RadioButton IsChecked="{Binding DrawingMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static enums:DrawingMode.Start}}" Content="Start" />
+                                        <RadioButton IsChecked="{Binding DrawingMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static enums:DrawingMode.Finish}}" Content="Finish" />
                                     </StackPanel>
                                 </GroupBox>
                             </WrapPanel>

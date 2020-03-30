@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
+using MultiRobotSimulator.Core.Enums;
 using MultiRobotSimulator.Core.Models;
 
 namespace MultiRobotSimulator.WPF
@@ -17,6 +19,34 @@ namespace MultiRobotSimulator.WPF
             var x = rect.Left + (rect.Width / 2);
             var y = rect.Top + (rect.Height / 2);
             return new Point(x, y);
+        }
+
+        public static EditorAction GetEditorAction(this MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Released)
+            {
+                if (e.RightButton == MouseButtonState.Pressed)
+                {
+                    return EditorAction.Remove;
+                }
+                else
+                {
+                    return EditorAction.Nothing;
+                }
+            }
+            else if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                if (e.RightButton == MouseButtonState.Released)
+                {
+                    return EditorAction.Add;
+                }
+                else
+                {
+                    return EditorAction.Nothing;
+                }
+            }
+
+            return EditorAction.Nothing;
         }
 
         public static Rect GetRect(this Tile tile, double cellSize = 1)

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Extensions.Logging;
+using MultiRobotSimulator.Core.Factories;
 using MultiRobotSimulator.WPF.Pages;
 using MultiRobotSimulator.WPF.Services;
 using NLog.Extensions.Logging;
@@ -25,8 +26,11 @@ namespace MultiRobotSimulator.WPF
         {
             builder.Assemblies.Add(Assembly.Load("MultiRobotSimulator.Core"));
 
-            builder.Bind<IIOService>().To<IOService>();
-            builder.Bind<IMapService>().To<MapService>();
+            // todo add plugin assemblies here, and add to Stylet IoC using .ToAllImplementations();
+
+            // singletons
+            builder.Bind<IIOService>().To<IOService>().InSingletonScope();
+            builder.Bind<IMapFactory>().To<MapFactory>().InSingletonScope();
 
             // logging
             builder.Bind<ILoggerFactory>().To<NLogLoggerFactory>();

@@ -61,5 +61,10 @@ namespace MultiRobotSimulator.WPF.Services
 
             return string.Empty;
         }
+
+        public void WriteAllText(string path, string contents)
+        {
+            File.WriteAllText(path, contents);
+        }
     }
 }

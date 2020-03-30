@@ -13,5 +13,7 @@ namespace MultiRobotSimulator.WPF.Services
         TextReader OpenTextFile(string path);
 
         string SaveFileDialog(string? defaultPath = null);
+
+        void WriteAllText(string path, string contents);
     }
 }

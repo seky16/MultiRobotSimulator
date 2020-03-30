@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Logging - [NLog](https://nlog-project.org/)
 
 ### Changed
+- Switched grid representation to graph using [QuickGraph](https://yaccconstructor.github.io/QuickGraph/)
+- Moved Enums to Core project
+- moved MapService to Core project and renamed to MapFactory
 
 ### Removed
 

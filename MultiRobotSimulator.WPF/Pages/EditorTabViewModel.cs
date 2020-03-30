@@ -51,13 +51,21 @@ namespace MultiRobotSimulator.WPF.Pages
 
                 return _map;
             }
-            set { SetAndNotify(ref _map, value); }
+            set
+            {
+                if (value is null)
+                {
+                    throw new InvalidOperationException($"{nameof(Map)} cannot be null.");
+                }
+                SetAndNotify(ref _map, value);
+            }
         }
 
         public void CanvasResized(object sender, SizeChangedEventArgs e)
         {
             if (EditorCanvas.ResizeEventHandler is null)
             {
+                // workaround for Canvas being resized before binding is complete
                 EditorCanvas.InitialSize = e.NewSize;
             }
             else

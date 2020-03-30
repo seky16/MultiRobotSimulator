@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Windows;
 using Microsoft.Extensions.Logging;
+using MultiRobotSimulator.Core.Enums;
+using MultiRobotSimulator.Core.Factories;
 using MultiRobotSimulator.WPF.Events;
 using MultiRobotSimulator.WPF.Services;
 using Stylet;
@@ -14,19 +16,19 @@ namespace MultiRobotSimulator.WPF.Pages
         private readonly IEventAggregator _eventAggregator;
         private readonly IIOService _ioService;
         private readonly ILogger<RootViewModel> _logger;
-        private readonly IMapService _mapService;
+        private readonly IMapFactory _mapFactory;
         private readonly Func<NewFileDialogViewModel> _newFileDialogFactory;
         private readonly IWindowManager _windowManager;
         private DrawingMode _drawingMode;
         private int untitledIndex = 0;
 
-        public RootViewModel(IIOService ioService, Func<EditorTabViewModel> editorCanvasFactory, IWindowManager windowManager, Func<NewFileDialogViewModel> newFileDialogFactory, IMapService mapService, IEventAggregator eventAggregator, ILogger<RootViewModel> logger)
+        public RootViewModel(IIOService ioService, Func<EditorTabViewModel> editorCanvasFactory, IWindowManager windowManager, Func<NewFileDialogViewModel> newFileDialogFactory, IMapFactory mapFactory, IEventAggregator eventAggregator, ILogger<RootViewModel> logger)
         {
             _ioService = ioService;
             _editorCanvasFactory = editorCanvasFactory;
             _windowManager = windowManager;
             _newFileDialogFactory = newFileDialogFactory;
-            _mapService = mapService;
+            _mapFactory = mapFactory;
             _eventAggregator = eventAggregator;
             _logger = logger;
         }
@@ -43,7 +45,7 @@ namespace MultiRobotSimulator.WPF.Pages
         {
             _logger.LogInformation("Clearing map '{displayName}'", ActiveItem.DisplayName);
 
-            ActiveItem.Map.EmptyTiles();
+            ActiveItem.HasChanges |= ActiveItem.Map.EmptyTiles();
             _eventAggregator.Publish(new CanvasRedrawEvent());
         }
 
@@ -59,7 +61,7 @@ namespace MultiRobotSimulator.WPF.Pages
             _logger.LogInformation("New map [{width};{height}]", dialog.Width, dialog.Height);
 
             var tab = _editorCanvasFactory();
-            tab.Map = _mapService.GetNewMap(dialog.Width, dialog.Height);
+            tab.Map = _mapFactory.CreateMap(dialog.Width, dialog.Height);
             tab.DisplayName = $"Untitled{++untitledIndex}.map";
 
             Items.Add(tab);
@@ -88,11 +90,10 @@ namespace MultiRobotSimulator.WPF.Pages
                 _logger.LogInformation("Opening file '{fullPath}'", path);
 
                 var textReader = _ioService.OpenTextFile(path);
-                var map = _mapService.ImportMap(textReader);
 
                 tab = _editorCanvasFactory();
                 tab.FullPath = path;
-                tab.Map = map;
+                tab.Map = _mapFactory.FromText(textReader);
 
                 Items.Add(tab);
 
@@ -169,7 +170,7 @@ namespace MultiRobotSimulator.WPF.Pages
 
             _logger.LogInformation("Saving item '{defaultPath}' as '{fullPath}'", defaultPath, fullPath);
 
-            _mapService.SaveMap(tab.Map, fullPath);
+            _ioService.WriteAllText(fullPath, tab.Map.GetString());
 
             tab.HasChanges = false;
             tab.FullPath = fullPath;

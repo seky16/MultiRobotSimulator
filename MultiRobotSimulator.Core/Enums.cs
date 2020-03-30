@@ -1,4 +1,4 @@
-﻿namespace MultiRobotSimulator.WPF
+﻿namespace MultiRobotSimulator.Core.Enums
 {
     public enum DrawingMode
     {

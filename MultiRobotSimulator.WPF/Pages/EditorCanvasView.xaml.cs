@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
@@ -6,7 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Extensions.Logging;
-using MultiRobotSimulator.Core.Models;
+using MultiRobotSimulator.Core.Enums;
 using MultiRobotSimulator.WPF.Events;
 using Stylet;
 
@@ -29,57 +30,6 @@ namespace MultiRobotSimulator.WPF.Pages
 
         public double CellSize { get; private set; }
 
-        private void AddToTile(Tile tile, DrawingMode drawingMode)
-        {
-            switch (drawingMode)
-            {
-                case DrawingMode.Obstacle:
-                    tile.Passable = SetValueAndMarkChange(tile.Passable, false);
-                    _tab!.HasChanges |= _tab.Map.RemoveStart(tile);
-                    _tab.HasChanges |= _tab.Map.RemoveFinish(tile);
-                    break;
-
-                case DrawingMode.Start:
-                    _tab!.HasChanges |= _tab.Map.AddStart(tile);
-                    break;
-
-                case DrawingMode.Finish:
-                    _tab!.HasChanges |= _tab.Map.AddFinish(tile);
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        private EditorAction GetEditorAction(MouseEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Released)
-            {
-                if (e.RightButton == MouseButtonState.Pressed)
-                {
-                    return EditorAction.Remove;
-                }
-                else
-                {
-                    return EditorAction.Nothing;
-                }
-            }
-            else if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                if (e.RightButton == MouseButtonState.Released)
-                {
-                    return EditorAction.Add;
-                }
-                else
-                {
-                    return EditorAction.Nothing;
-                }
-            }
-
-            return EditorAction.Nothing;
-        }
-
         private FormattedText GetFormattedText(object text)
         {
             return new FormattedText(text.ToString(), CultureInfo.CurrentUICulture, FlowDirection.LeftToRight, _typeface, 12, Brushes.Black, null, TextFormattingMode.Display, VisualTreeHelper.GetDpi(this).PixelsPerDip)
@@ -92,12 +42,12 @@ namespace MultiRobotSimulator.WPF.Pages
 
         private void HandleMouse(MouseEventArgs e)
         {
-            if (_tab?.Map is null)
+            if (_tab is null)
             {
                 return;
             }
 
-            var editorAction = GetEditorAction(e);
+            var editorAction = e.GetEditorAction();
 
             if (editorAction == EditorAction.Nothing)
             {
@@ -107,7 +57,7 @@ namespace MultiRobotSimulator.WPF.Pages
             var screenPos = e.GetPosition(this);
             var canvasPos = screenPos.ScreenToCanvas(CellSize);
 
-            var tile = _tab.Map.Tiles.GetTileOnScreenPos(screenPos, CellSize);
+            var tile = _tab.Map.Graph.Vertices.GetTileOnScreenPos(screenPos, CellSize);
 
             if (tile is null)
             {
@@ -116,37 +66,36 @@ namespace MultiRobotSimulator.WPF.Pages
 
             if (editorAction == EditorAction.Remove)
             {
-                RemoveFromTile(tile);
+                _tab.HasChanges |= tile.Empty();
             }
 
             if (editorAction == EditorAction.Add)
             {
                 var drawingMode = ((RootViewModel)_tab.Parent).DrawingMode;
-                AddToTile(tile, drawingMode);
+                _tab.HasChanges |= tile.AddToTile(drawingMode);
             }
 
             Render();
         }
 
-        private void RemoveFromTile(Tile tile)
-        {
-            _tab!.HasChanges |= _tab.Map.RemoveFinish(tile);
-            _tab.HasChanges |= _tab.Map.RemoveStart(tile);
-            tile.Passable = SetValueAndMarkChange(tile.Passable, true);
-        }
-
         private void Render()
         {
+            _logger.LogDebug("Canvas render");
+
+            var sw = Stopwatch.StartNew();
             // https://stackoverflow.com/a/44426783
             var drawingContext = _backingStore.Open();
             Render(drawingContext);
             drawingContext.Close();
+            sw.Stop();
+
+            _logger.LogTrace("Render took {milliseconds} ms", sw.ElapsedMilliseconds);
         }
 
         private void Render(DrawingContext drawingContext)
         {
             // Map wasn't set yet - nothing to render
-            if (_tab?.Map is null || CellSize == 0)
+            if (_tab is null || CellSize == 0)
             {
                 return;
             }
@@ -185,21 +134,28 @@ namespace MultiRobotSimulator.WPF.Pages
 
         private void RenderTiles(DrawingContext drawingContext)
         {
-            foreach (var obstacle in _tab!.Map.Tiles.Where(t => !t.Passable))
+            if (_tab is null)
+            {
+                return;
+            }
+
+            foreach (var obstacle in _tab.Map.Graph.Vertices.Where(t => !t.Passable))
             {
                 drawingContext.DrawRectangle(Brushes.Black, null, obstacle.GetRect(CellSize));
             }
 
-            for (var i = 0; i < _tab.Map.Starts.Count; i++)
+            var starts = _tab.Map.Graph.Vertices.Where(t => t.IsStart);
+            for (var i = 0; i < starts.Count(); i++)
             {
-                var rect = _tab.Map.Starts[i].GetRect(CellSize);
+                var rect = starts.ElementAt(i).GetRect(CellSize);
                 drawingContext.DrawEllipse(Brushes.Green, null, rect.Center(), CellSize / 2, CellSize / 2);
                 drawingContext.DrawText(GetFormattedText(i + 1), rect.TopLeft);
             }
 
-            for (var j = 0; j < _tab.Map.Finishes.Count; j++)
+            var finishes = _tab.Map.Graph.Vertices.Where(t => t.IsFinish);
+            for (var j = 0; j < finishes.Count(); j++)
             {
-                var rect = _tab.Map.Finishes[j].GetRect(CellSize);
+                var rect = finishes.ElementAt(j).GetRect(CellSize);
                 drawingContext.DrawEllipse(Brushes.Red, null, rect.Center(), CellSize / 2, CellSize / 2);
                 drawingContext.DrawText(GetFormattedText(j + 1), rect.TopLeft);
             }
@@ -210,7 +166,7 @@ namespace MultiRobotSimulator.WPF.Pages
             _logger.LogDebug("SetCanvasSize: {size}", size);
 
             // Map wasn't set yet - nothing to render
-            if (_tab?.Map is null)
+            if (_tab is null)
             {
                 return;
             }
@@ -236,15 +192,6 @@ namespace MultiRobotSimulator.WPF.Pages
             Height = canvasHeight;
 
             CellSize = Math.Min(canvasWidth / _tab.Map.Width, canvasHeight / _tab.Map.Height); // should be same, Math.Min just to be sure
-        }
-
-        private bool SetValueAndMarkChange(bool valueNow, bool valueToSet)
-        {
-            if (valueNow != valueToSet)
-            {
-                _tab!.HasChanges = true;
-            }
-            return valueToSet;
         }
 
         #region Event handlers
@@ -277,6 +224,8 @@ namespace MultiRobotSimulator.WPF.Pages
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            _logger.LogDebug("DataContextChanged: '{newContext}'", e.NewValue);
+
             if (e.NewValue is EditorCanvasViewModel editorCanvasViewModel)
             {
                 _tab = editorCanvasViewModel.EditorTab;
