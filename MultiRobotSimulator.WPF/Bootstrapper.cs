@@ -4,6 +4,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Extensions.Logging;
+using MultiRobotSimulator.Abstractions;
 using MultiRobotSimulator.Core.Factories;
 using MultiRobotSimulator.WPF.Pages;
 using MultiRobotSimulator.WPF.Services;
@@ -25,8 +26,10 @@ namespace MultiRobotSimulator.WPF
         protected override void ConfigureIoC(IStyletIoCBuilder builder)
         {
             builder.Assemblies.Add(Assembly.Load("MultiRobotSimulator.Core"));
+            builder.Assemblies.Add(Assembly.Load("MultiRobotSimulator.Abstractions"));
 
             // todo add plugin assemblies here, and add to Stylet IoC using .ToAllImplementations();
+            builder.Bind<IAlgo>().ToAllImplementations();
 
             // singletons
             builder.Bind<IIOService>().To<IOService>().InSingletonScope();

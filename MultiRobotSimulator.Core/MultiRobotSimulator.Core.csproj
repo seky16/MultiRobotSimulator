@@ -13,4 +13,8 @@
     <PackageReference Include="YC.QuickGraph" Version="3.7.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MultiRobotSimulator.Abstractions\MultiRobotSimulator.Abstractions.csproj" />
+  </ItemGroup>
+
 </Project>

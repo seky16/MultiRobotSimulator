@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using MultiRobotSimulator.Abstractions;
 using MultiRobotSimulator.Core.Enums;
-using MultiRobotSimulator.Core.Models;
 
 namespace MultiRobotSimulator.WPF
 {
@@ -49,12 +49,12 @@ namespace MultiRobotSimulator.WPF
             return EditorAction.Nothing;
         }
 
-        public static Rect GetRect(this Tile tile, double cellSize = 1)
+        public static Rect GetRect(this ITile tile, double cellSize = 1)
         {
             return new Rect(tile.X * cellSize, tile.Y * cellSize, cellSize, cellSize);
         }
 
-        public static Tile? GetTileOnScreenPos(this IEnumerable<Tile> tiles, Point pos, double cellSize)
+        public static ITile? GetTileOnScreenPos(this IEnumerable<ITile> tiles, Point pos, double cellSize)
         {
             return tiles.FirstOrDefault(t => t.GetRect(cellSize).Contains(pos));
         }

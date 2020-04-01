@@ -16,25 +16,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Logging - [NLog](https://nlog-project.org/)
 
 ### Changed
-- Switched grid representation to graph using [QuickGraph](https://yaccconstructor.github.io/QuickGraph/)
-- Moved Enums to Core project
-- moved MapService to Core project and renamed to MapFactory
 
 ### Removed
 
-## [0.1.0] (2020-xx-xx)
+## [0.2.0] (2020-04-02)
+### Added
+- Logging - [NLog](https://nlog-project.org/)
+- Abstractions project (API)
+- Single-robot implementation of Dijkstra's algorithm (WIP)
+- Wrapper around graph
+- `AlgoService` responsible for handling algorithms
+
+### Changed
+- Switched grid representation to graph using [QuickGraph](https://yaccconstructor.github.io/QuickGraph/)
+- Moved `Enums` to Core project
+- moved `MapService` to Core project and renamed to `MapFactory`
+- Renamed `Tile#IsFinish` to `Tile#IsTarget`
+
+## [0.1.0] (2020-03-03)
 ### Added
 - Saving/loading `.map` files ([MovingAI](https://www.movingai.com/benchmarks/formats.html))
 - Multiple `.map` tabs
 - Drawing obstacles/starts/finishes
 
-### Changed
 
-### Removed
-
-
-[Unreleased]: https://github.com/seky16/MultiRobotSimulator/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/seky16/MultiRobotSimulator/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/seky16/MultiRobotSimulator/compare/v0.1.0...0.2.0
 [0.1.0]: https://github.com/seky16/MultiRobotSimulator/compare/v0.1.0

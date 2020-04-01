@@ -70,7 +70,7 @@
                                     <StackPanel>
                                         <RadioButton IsChecked="{Binding DrawingMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static enums:DrawingMode.Obstacle}}" Content="Obstacle" />
                                         <RadioButton IsChecked="{Binding DrawingMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static enums:DrawingMode.Start}}" Content="Start" />
-                                        <RadioButton IsChecked="{Binding DrawingMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static enums:DrawingMode.Finish}}" Content="Finish" />
+                                        <RadioButton IsChecked="{Binding DrawingMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static enums:DrawingMode.Target}}" Content="Target" />
                                     </StackPanel>
                                 </GroupBox>
                             </WrapPanel>
@@ -82,6 +82,8 @@
                             <TextBlock>* Python ?</TextBlock>
                             <TextBlock>* Lua ?</TextBlock>
                             <TextBlock>* JS ?</TextBlock>
+                            <ComboBox ItemsSource="{Binding Algos}" DisplayMemberPath="Value" SelectedValuePath="Key" SelectedValue="{Binding SelectedAlgo, Mode=TwoWay}"></ComboBox>
+                            <Button Click="{s:Action RunSearch}">Run search</Button>
                         </WrapPanel>
                     </TabItem>
                 </TabControl>

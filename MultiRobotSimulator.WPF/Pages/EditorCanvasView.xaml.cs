@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Extensions.Logging;
 using MultiRobotSimulator.Core.Enums;
+using MultiRobotSimulator.Core.Models;
 using MultiRobotSimulator.WPF.Events;
 using Stylet;
 
@@ -57,16 +58,16 @@ namespace MultiRobotSimulator.WPF.Pages
             var screenPos = e.GetPosition(this);
             var canvasPos = screenPos.ScreenToCanvas(CellSize);
 
-            var tile = _tab.Map.Graph.Vertices.GetTileOnScreenPos(screenPos, CellSize);
+            var iTile = _tab.Map.Graph.Vertices.GetTileOnScreenPos(screenPos, CellSize);
 
-            if (tile is null)
+            if (!(iTile is Tile tile))
             {
                 return;
             }
 
             if (editorAction == EditorAction.Remove)
             {
-                _tab.HasChanges |= tile.Empty();
+                _tab.HasChanges |= tile.SetToDefault();
             }
 
             if (editorAction == EditorAction.Add)
@@ -80,7 +81,7 @@ namespace MultiRobotSimulator.WPF.Pages
 
         private void Render()
         {
-            _logger.LogDebug("Canvas render");
+            _logger.LogTrace("Canvas render");
 
             var sw = Stopwatch.StartNew();
             // https://stackoverflow.com/a/44426783
@@ -152,7 +153,7 @@ namespace MultiRobotSimulator.WPF.Pages
                 drawingContext.DrawText(GetFormattedText(i + 1), rect.TopLeft);
             }
 
-            var finishes = _tab.Map.Graph.Vertices.Where(t => t.IsFinish);
+            var finishes = _tab.Map.Graph.Vertices.Where(t => t.IsTarget);
             for (var j = 0; j < finishes.Count(); j++)
             {
                 var rect = finishes.ElementAt(j).GetRect(CellSize);

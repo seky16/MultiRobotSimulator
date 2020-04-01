@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using Microsoft.Extensions.Logging;
@@ -12,7 +13,9 @@ namespace MultiRobotSimulator.WPF.Pages
 {
     public class RootViewModel : Conductor<EditorTabViewModel>.Collection.OneActive
     {
-        private readonly Func<EditorTabViewModel> _editorCanvasFactory;
+        private readonly AlgoService _algoService;
+
+        private readonly Func<EditorTabViewModel> _editorTabFactory;
         private readonly IEventAggregator _eventAggregator;
         private readonly IIOService _ioService;
         private readonly ILogger<RootViewModel> _logger;
@@ -20,18 +23,33 @@ namespace MultiRobotSimulator.WPF.Pages
         private readonly Func<NewFileDialogViewModel> _newFileDialogFactory;
         private readonly IWindowManager _windowManager;
         private DrawingMode _drawingMode;
+        private Guid _selectedAlgo;
         private int untitledIndex = 0;
 
-        public RootViewModel(IIOService ioService, Func<EditorTabViewModel> editorCanvasFactory, IWindowManager windowManager, Func<NewFileDialogViewModel> newFileDialogFactory, IMapFactory mapFactory, IEventAggregator eventAggregator, ILogger<RootViewModel> logger)
+        public RootViewModel(
+            AlgoService algoService,
+            Func<EditorTabViewModel> editorTabFactory,
+            IEventAggregator eventAggregator,
+            IIOService ioService,
+            ILogger<RootViewModel> logger,
+            IMapFactory mapFactory,
+            Func<NewFileDialogViewModel> newFileDialogFactory,
+            IWindowManager windowManager)
         {
-            _ioService = ioService;
-            _editorCanvasFactory = editorCanvasFactory;
-            _windowManager = windowManager;
-            _newFileDialogFactory = newFileDialogFactory;
-            _mapFactory = mapFactory;
+            _editorTabFactory = editorTabFactory;
             _eventAggregator = eventAggregator;
+            _ioService = ioService;
             _logger = logger;
+            _mapFactory = mapFactory;
+            _newFileDialogFactory = newFileDialogFactory;
+            _windowManager = windowManager;
+            _algoService = algoService;
+
+            Algos = _algoService.DisplayNames;
+            SelectedAlgo = Algos.Keys.FirstOrDefault();
         }
+
+        public Dictionary<Guid, string> Algos { get; }
 
         public DrawingMode DrawingMode
         {
@@ -40,6 +58,12 @@ namespace MultiRobotSimulator.WPF.Pages
         }
 
         public bool HasOpenTabs => Items.Count > 0;
+
+        public Guid SelectedAlgo
+        {
+            get { return _selectedAlgo; }
+            set { SetAndNotify(ref _selectedAlgo, value); }
+        }
 
         public void EditorClearAll()
         {
@@ -60,7 +84,7 @@ namespace MultiRobotSimulator.WPF.Pages
 
             _logger.LogInformation("New map [{width};{height}]", dialog.Width, dialog.Height);
 
-            var tab = _editorCanvasFactory();
+            var tab = _editorTabFactory();
             tab.Map = _mapFactory.CreateMap(dialog.Width, dialog.Height);
             tab.DisplayName = $"Untitled{++untitledIndex}.map";
 
@@ -91,7 +115,7 @@ namespace MultiRobotSimulator.WPF.Pages
 
                 var textReader = _ioService.OpenTextFile(path);
 
-                tab = _editorCanvasFactory();
+                tab = _editorTabFactory();
                 tab.FullPath = path;
                 tab.Map = _mapFactory.FromText(textReader);
 
@@ -114,6 +138,11 @@ namespace MultiRobotSimulator.WPF.Pages
         public void FileSaveAs()
         {
             Save(ActiveItem, null);
+        }
+
+        public void RunSearch()
+        {
+            _algoService.RunSearch(SelectedAlgo, ActiveItem.Map.Graph);
         }
 
         public void TabClose(string param)

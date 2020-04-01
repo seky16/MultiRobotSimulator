@@ -1,20 +1,21 @@
-﻿using MultiRobotSimulator.Core.Enums;
+﻿using MultiRobotSimulator.Abstractions;
+using MultiRobotSimulator.Core.Enums;
 
 namespace MultiRobotSimulator.Core.Models
 {
-    public class Tile
+    public class Tile : ITile
     {
-        public const bool IsFinishDefaultValue = false;
-        public const bool IsStartDefaultValue = false;
-        public const bool PassableDefaultValue = true;
+        private const bool IsStartDefaultValue = false;
+        private const bool IsTargetDefaultValue = false;
+        private const bool PassableDefaultValue = true;
 
-        public bool IsFinish { get; set; } = IsFinishDefaultValue;
         public bool IsStart { get; set; } = IsStartDefaultValue;
+        public bool IsTarget { get; set; } = IsTargetDefaultValue;
         public bool Passable { get; set; } = PassableDefaultValue;
         public int X { get; set; } = -1;
         public int Y { get; set; } = -1;
 
-        private bool IsEmpty => IsFinish == IsFinishDefaultValue && IsStart == IsStartDefaultValue && Passable == PassableDefaultValue;
+        private bool IsEmpty => IsTarget == IsTargetDefaultValue && IsStart == IsStartDefaultValue && Passable == PassableDefaultValue;
 
         public bool AddToTile(DrawingMode drawingMode)
         {
@@ -33,8 +34,8 @@ namespace MultiRobotSimulator.Core.Models
                     IsStart = true;
                     break;
 
-                case DrawingMode.Finish:
-                    IsFinish = true;
+                case DrawingMode.Target:
+                    IsTarget = true;
                     break;
 
                 default:
@@ -44,14 +45,14 @@ namespace MultiRobotSimulator.Core.Models
             return true;
         }
 
-        public bool Empty()
+        public bool SetToDefault()
         {
             if (IsEmpty)
             {
                 return false;
             }
 
-            IsFinish = IsFinishDefaultValue;
+            IsTarget = IsTargetDefaultValue;
             IsStart = IsStartDefaultValue;
             Passable = PassableDefaultValue;
             return true;

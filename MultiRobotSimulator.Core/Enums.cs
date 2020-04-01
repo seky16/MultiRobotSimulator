@@ -4,7 +4,7 @@
     {
         Obstacle,
         Start,
-        Finish
+        Target
     }
 
     public enum EditorAction

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Globalization;
-using System.Linq;
 using System.Text;
-using QuickGraph;
+using MultiRobotSimulator.Abstractions;
 
 namespace MultiRobotSimulator.Core.Models
 {
@@ -20,33 +19,10 @@ namespace MultiRobotSimulator.Core.Models
         {
             Width = width;
             Height = height;
-            Graph = new UndirectedGraph<Tile, SEdge<Tile>>(false);
-            for (var y = 0; y < Height; y++)
-            {
-                for (var x = 0; x < Width; x++)
-                {
-                    var tile = new Tile() { X = x, Y = y };
-                    Graph.AddVertex(tile);
-                }
-            }
-
-            foreach (var tile in Graph.Vertices)
-            {
-                for (var yOffset = -1; yOffset <= 1; yOffset++)
-                {
-                    for (var xOffset = -1; xOffset <= 1; xOffset++)
-                    {
-                        var neighbour = GetTileAtPos(tile.X + xOffset, tile.Y + yOffset);
-                        if (neighbour != null && neighbour != tile)
-                        {
-                            Graph.AddEdge(new SEdge<Tile>(tile, neighbour));
-                        }
-                    }
-                }
-            }
+            Graph = new Graph(width, height);
         }
 
-        public UndirectedGraph<Tile, SEdge<Tile>> Graph { get; set; }
+        public Graph Graph { get; set; }
 
         public int Height { get; set; }
 
@@ -55,9 +31,9 @@ namespace MultiRobotSimulator.Core.Models
         public bool EmptyTiles()
         {
             var result = false;
-            foreach (var tile in Graph.Vertices)
+            foreach (Tile tile in Graph.Vertices)
             {
-                result |= tile.Empty();
+                result |= tile.SetToDefault();
             }
 
             return result;
@@ -74,14 +50,14 @@ namespace MultiRobotSimulator.Core.Models
             sb.AppendLine(MapStr);
 
             // map
-            Tile? tile;
+            ITile? iTile;
             for (var y = 0; y < Height; y++)
             {
                 for (var x = 0; x < Width; x++)
                 {
-                    tile = GetTileAtPos(x, y);
+                    iTile = Graph.GetTileAtPos(x, y);
 
-                    if (tile is null)
+                    if (!(iTile is Tile tile))
                     {
                         throw new InvalidOperationException($"Couldn't find tile at [{x};{y}]");
                     }
@@ -93,7 +69,5 @@ namespace MultiRobotSimulator.Core.Models
 
             return sb.ToString();
         }
-
-        public Tile? GetTileAtPos(int x, int y) => Graph.Vertices.SingleOrDefault(t => t.X == x && t.Y == y);
     }
 }
