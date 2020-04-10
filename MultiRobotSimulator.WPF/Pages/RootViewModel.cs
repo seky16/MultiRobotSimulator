@@ -69,7 +69,7 @@ namespace MultiRobotSimulator.WPF.Pages
         {
             _logger.LogInformation("Clearing map '{displayName}'", ActiveItem.DisplayName);
 
-            ActiveItem.HasChanges |= ActiveItem.Map.EmptyTiles();
+            ActiveItem.HasChanges |= ActiveItem.Map.ClearAll();
             _eventAggregator.Publish(new CanvasRedrawEvent());
         }
 
@@ -142,7 +142,7 @@ namespace MultiRobotSimulator.WPF.Pages
 
         public void RunSearch()
         {
-            _algoService.RunSearch(SelectedAlgo, ActiveItem.Map.Graph);
+            _algoService.RunSearch(SelectedAlgo, ActiveItem.Map);
         }
 
         public void TabClose(string param)

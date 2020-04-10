@@ -43,7 +43,7 @@ namespace MultiRobotSimulator.Core.Factories
                 line = textReader.ReadLine() ?? string.Empty;
                 for (var x = 0; x < width; x++)
                 {
-                    var tile = map.Graph.GetTileAtPos(x, y);
+                    var tile = map.GetTileAtPos(x, y);
 
                     if (tile is null)
                     {

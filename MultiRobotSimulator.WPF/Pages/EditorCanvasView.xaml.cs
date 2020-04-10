@@ -58,7 +58,7 @@ namespace MultiRobotSimulator.WPF.Pages
             var screenPos = e.GetPosition(this);
             var canvasPos = screenPos.ScreenToCanvas(CellSize);
 
-            var iTile = _tab.Map.Graph.Vertices.GetTileOnScreenPos(screenPos, CellSize);
+            var iTile = _tab.Map.Vertices.GetTileOnScreenPos(screenPos, CellSize);
 
             if (!(iTile is Tile tile))
             {
@@ -67,13 +67,13 @@ namespace MultiRobotSimulator.WPF.Pages
 
             if (editorAction == EditorAction.Remove)
             {
-                _tab.HasChanges |= tile.SetToDefault();
+                _tab.HasChanges |= _tab.Map.RemoveFromTile(tile);
             }
 
             if (editorAction == EditorAction.Add)
             {
                 var drawingMode = ((RootViewModel)_tab.Parent).DrawingMode;
-                _tab.HasChanges |= tile.AddToTile(drawingMode);
+                _tab.HasChanges |= _tab.Map.AddToTile(tile, drawingMode);
             }
 
             Render();
@@ -140,12 +140,12 @@ namespace MultiRobotSimulator.WPF.Pages
                 return;
             }
 
-            foreach (var obstacle in _tab.Map.Graph.Vertices.Where(t => !t.Passable))
+            foreach (var obstacle in _tab.Map.Vertices.Where(t => !t.Passable))
             {
                 drawingContext.DrawRectangle(Brushes.Black, null, obstacle.GetRect(CellSize));
             }
 
-            var starts = _tab.Map.Graph.Vertices.Where(t => t.IsStart);
+            var starts = _tab.Map.Vertices.Where(t => t.IsStart);
             for (var i = 0; i < starts.Count(); i++)
             {
                 var rect = starts.ElementAt(i).GetRect(CellSize);
@@ -153,7 +153,7 @@ namespace MultiRobotSimulator.WPF.Pages
                 drawingContext.DrawText(GetFormattedText(i + 1), rect.TopLeft);
             }
 
-            var finishes = _tab.Map.Graph.Vertices.Where(t => t.IsTarget);
+            var finishes = _tab.Map.Vertices.Where(t => t.IsTarget);
             for (var j = 0; j < finishes.Count(); j++)
             {
                 var rect = finishes.ElementAt(j).GetRect(CellSize);
