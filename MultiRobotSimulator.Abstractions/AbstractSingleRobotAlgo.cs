@@ -8,13 +8,13 @@ namespace MultiRobotSimulator.Abstractions
     {
         private IGraph? graph;
 
-        private ITile? start;
+        private AbstractTile? start;
 
-        private ITile? target;
+        private AbstractTile? target;
 
         protected AbstractSingleRobotAlgo()
         {
-            Path = new List<ITile>();
+            Path = new List<AbstractTile>();
         }
 
         public IGraph Graph
@@ -34,9 +34,9 @@ namespace MultiRobotSimulator.Abstractions
 
         public abstract string Name { get; }
 
-        public List<ITile> Path { get; }
+        public List<AbstractTile> Path { get; }
 
-        public ITile Start
+        public AbstractTile Start
         {
             get
             {
@@ -49,7 +49,7 @@ namespace MultiRobotSimulator.Abstractions
             private set { start = value; }
         }
 
-        public ITile Target
+        public AbstractTile Target
         {
             get
             {

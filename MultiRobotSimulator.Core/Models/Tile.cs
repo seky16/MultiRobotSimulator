@@ -2,18 +2,19 @@
 
 namespace MultiRobotSimulator.Core.Models
 {
-    public class Tile : ITile
+    public class Tile : AbstractTile
     {
         private const bool IsStartDefaultValue = false;
         private const bool IsTargetDefaultValue = false;
         private const bool PassableDefaultValue = true;
 
+        public Tile()
+        {
+            X = Y = -1;
+            SetToDefault();
+        }
+
         public bool IsEmpty => IsTarget == IsTargetDefaultValue && IsStart == IsStartDefaultValue && Passable == PassableDefaultValue;
-        public bool IsStart { get; set; } = IsStartDefaultValue;
-        public bool IsTarget { get; set; } = IsTargetDefaultValue;
-        public bool Passable { get; set; } = PassableDefaultValue;
-        public int X { get; set; } = -1;
-        public int Y { get; set; } = -1;
 
         public bool SetToDefault()
         {

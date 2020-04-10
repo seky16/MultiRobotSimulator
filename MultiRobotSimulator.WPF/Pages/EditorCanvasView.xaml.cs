@@ -59,9 +59,9 @@ namespace MultiRobotSimulator.WPF.Pages
             var screenPos = e.GetPosition(this);
             var canvasPos = screenPos.ScreenToCanvas(CellSize);
 
-            var iTile = _tab.Map.Vertices.GetTileOnScreenPos(screenPos, CellSize);
+            var t = _tab.Map.Vertices.GetTileOnScreenPos(screenPos, CellSize);
 
-            if (!(iTile is Tile tile))
+            if (!(t is Tile tile))
             {
                 return;
             }

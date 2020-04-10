@@ -7,9 +7,9 @@ namespace MultiRobotSimulator.Core
 {
     public class DijkstraAlgo : AbstractSingleRobotAlgo
     {
-        private readonly Dictionary<ITile, double> dist = new Dictionary<ITile, double>();
-        private readonly Dictionary<ITile, ITile?> prev = new Dictionary<ITile, ITile?>();
-        private readonly List<ITile> Q = new List<ITile>();
+        private readonly Dictionary<AbstractTile, double> dist = new Dictionary<AbstractTile, double>();
+        private readonly Dictionary<AbstractTile, AbstractTile?> prev = new Dictionary<AbstractTile, AbstractTile?>();
+        private readonly List<AbstractTile> Q = new List<AbstractTile>();
 
         public override string Name => "Dijkstra's algorithm";
 
@@ -26,7 +26,7 @@ namespace MultiRobotSimulator.Core
 
             dist[Start] = 0;
 
-            ITile? u = null;
+            AbstractTile? u = null;
             while (Q.Count > 0)
             {
                 u = Q.OrderBy(t => dist[t]).First();

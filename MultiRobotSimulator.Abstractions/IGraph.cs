@@ -4,29 +4,29 @@ namespace MultiRobotSimulator.Abstractions
 {
     public interface IGraph
     {
-        IEnumerable<(ITile, ITile)> Edges { get; }
-        IEnumerable<ITile> Vertices { get; }
+        IEnumerable<(AbstractTile, AbstractTile)> Edges { get; }
+        IEnumerable<AbstractTile> Vertices { get; }
 
-        int AdjacentDegree(ITile v);
+        int AdjacentDegree(AbstractTile v);
 
-        (ITile, ITile) AdjacentEdge(ITile v, int index);
+        (AbstractTile, AbstractTile) AdjacentEdge(AbstractTile v, int index);
 
-        IEnumerable<(ITile, ITile)> AdjacentEdges(ITile v);
+        IEnumerable<(AbstractTile, AbstractTile)> AdjacentEdges(AbstractTile v);
 
-        IEnumerable<ITile> AdjacentVertices(ITile v);
+        IEnumerable<AbstractTile> AdjacentVertices(AbstractTile v);
 
-        bool ContainsEdge(ITile source, ITile target);
+        bool ContainsEdge(AbstractTile source, AbstractTile target);
 
-        bool ContainsEdge((ITile, ITile) edge);
+        bool ContainsEdge((AbstractTile, AbstractTile) edge);
 
-        bool ContainsVertex(ITile vertex);
+        bool ContainsVertex(AbstractTile vertex);
 
-        ITile? GetTileAtPos(int x, int y);
+        AbstractTile? GetTileAtPos(int x, int y);
 
         object GetWrappedGraph();
 
-        bool IsAdjacentEdgesEmpty(ITile v);
+        bool IsAdjacentEdgesEmpty(AbstractTile v);
 
-        bool TryGetEdge(ITile source, ITile target, out (ITile, ITile) edge);
+        bool TryGetEdge(AbstractTile source, AbstractTile target, out (AbstractTile, AbstractTile) edge);
     }
 }

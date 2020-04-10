@@ -49,12 +49,12 @@ namespace MultiRobotSimulator.WPF
             return EditorAction.Nothing;
         }
 
-        public static Rect GetRect(this ITile tile, double cellSize = 1)
+        public static Rect GetRect(this AbstractTile tile, double cellSize = 1)
         {
             return new Rect(tile.X * cellSize, tile.Y * cellSize, cellSize, cellSize);
         }
 
-        public static ITile? GetTileOnScreenPos(this IEnumerable<ITile> tiles, Point pos, double cellSize)
+        public static AbstractTile? GetTileOnScreenPos(this IEnumerable<AbstractTile> tiles, Point pos, double cellSize)
         {
             return tiles.FirstOrDefault(t => t.GetRect(cellSize).Contains(pos));
         }

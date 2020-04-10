@@ -10,7 +10,7 @@ namespace MultiRobotSimulator.Core.Factories
 
         public Map FromText(TextReader textReader)
         {
-            static FormatException getInvalidHeaderEx(Exception? innerException = null) => new FormatException("Invalid header.", innerException);
+            static FormatException getInvalidHeaderEx() => new FormatException("Invalid header.");
 
             var line = textReader.ReadLine();
             if (line?.Equals(Map.TypeStr, StringComparison.Ordinal) != true)
@@ -43,9 +43,9 @@ namespace MultiRobotSimulator.Core.Factories
                 line = textReader.ReadLine() ?? string.Empty;
                 for (var x = 0; x < width; x++)
                 {
-                    var tile = map.GetTileAtPos(x, y);
+                    var t = map.GetTileAtPos(x, y);
 
-                    if (tile is null)
+                    if (!(t is Tile tile))
                     {
                         throw new InvalidOperationException($"Couldn't find tile at [{x};{y}]");
                     }
@@ -56,14 +56,15 @@ namespace MultiRobotSimulator.Core.Factories
                         case '.':
                         case 'G':
                         case 'S':
-                            tile.Passable = true;
+                            // passable
                             break;
 
                         case '@':
                         case 'O':
                         case 'T':
                         case 'W':
-                            tile.Passable = false;
+                            // obstacle
+                            map.AddToTile(tile, Enums.DrawingMode.Obstacle);
                             break;
 
                         default:

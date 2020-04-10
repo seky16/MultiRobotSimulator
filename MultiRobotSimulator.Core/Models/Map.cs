@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -104,14 +104,14 @@ namespace MultiRobotSimulator.Core.Models
             sb.AppendLine(MapStr);
 
             // map
-            ITile? iTile;
+            AbstractTile? t;
             for (var y = 0; y < Height; y++)
             {
                 for (var x = 0; x < Width; x++)
                 {
-                    iTile = GetTileAtPos(x, y);
+                    t = GetTileAtPos(x, y);
 
-                    if (!(iTile is Tile tile))
+                    if (!(t is Tile tile))
                     {
                         throw new InvalidOperationException($"Couldn't find tile at [{x};{y}]");
                     }
@@ -124,7 +124,7 @@ namespace MultiRobotSimulator.Core.Models
             return sb.ToString();
         }
 
-        public ITile? GetTileAtPos(int x, int y) => _wrappedGraph.Vertices.SingleOrDefault(t => t.X == x && t.Y == y);
+        public AbstractTile? GetTileAtPos(int x, int y) => _wrappedGraph.Vertices.SingleOrDefault(t => t.X == x && t.Y == y);
 
         public bool RemoveFromTile(Tile tile)
         {
@@ -175,7 +175,7 @@ namespace MultiRobotSimulator.Core.Models
             return _wrappedGraph.AdjacentDegree(tile);
         }
 
-        public (ITile, ITile) AdjacentEdge(ITile v, int index)
+        public (AbstractTile, AbstractTile) AdjacentEdge(AbstractTile v, int index)
         {
             if (!(v is Tile tile))
                 throw GetException(v);
@@ -184,16 +184,16 @@ namespace MultiRobotSimulator.Core.Models
             return (edge.Source, edge.Target);
         }
 
-        public IEnumerable<(ITile, ITile)> AdjacentEdges(ITile v)
+        public IEnumerable<(AbstractTile, AbstractTile)> AdjacentEdges(AbstractTile v)
         {
             if (!(v is Tile tile))
                 throw GetException(v);
 
             var edges = _wrappedGraph.AdjacentEdges(tile);
-            return edges.Select(e => ((ITile)e.Source, (ITile)e.Target));
+            return edges.Select(e => ((AbstractTile)e.Source, (AbstractTile)e.Target));
         }
 
-        public IEnumerable<ITile> AdjacentVertices(ITile v)
+        public IEnumerable<AbstractTile> AdjacentVertices(AbstractTile v)
         {
             if (!(v is Tile tile))
                 throw GetException(v);
@@ -201,7 +201,7 @@ namespace MultiRobotSimulator.Core.Models
             return _wrappedGraph.AdjacentVertices(tile);
         }
 
-        public bool ContainsEdge(ITile source, ITile target)
+        public bool ContainsEdge(AbstractTile source, AbstractTile target)
         {
             if (!(source is Tile tSource))
                 throw GetException(source);
@@ -211,7 +211,7 @@ namespace MultiRobotSimulator.Core.Models
             return _wrappedGraph.ContainsEdge(tSource, tTarget);
         }
 
-        public bool ContainsEdge((ITile, ITile) edge)
+        public bool ContainsEdge((AbstractTile, AbstractTile) edge)
         {
             if (!(edge.Item1 is Tile source))
                 throw GetException(edge.Item1);
@@ -223,7 +223,7 @@ namespace MultiRobotSimulator.Core.Models
             return _wrappedGraph.ContainsEdge(tEdge);
         }
 
-        public bool ContainsVertex(ITile v)
+        public bool ContainsVertex(AbstractTile v)
         {
             if (!(v is Tile tile))
                 throw GetException(v);
@@ -236,7 +236,7 @@ namespace MultiRobotSimulator.Core.Models
             return _wrappedGraph.Clone();
         }
 
-        public bool IsAdjacentEdgesEmpty(ITile v)
+        public bool IsAdjacentEdgesEmpty(AbstractTile v)
         {
             if (!(v is Tile tile))
                 throw GetException(v);
@@ -244,7 +244,7 @@ namespace MultiRobotSimulator.Core.Models
             return _wrappedGraph.IsAdjacentEdgesEmpty(tile);
         }
 
-        public bool TryGetEdge(ITile source, ITile target, out (ITile, ITile) edge)
+        public bool TryGetEdge(AbstractTile source, AbstractTile target, out (AbstractTile, AbstractTile) edge)
         {
             if (!(source is Tile sourceTile))
                 throw GetException(source);
@@ -252,7 +252,7 @@ namespace MultiRobotSimulator.Core.Models
             if (!(target is Tile targetTile))
                 throw GetException(target);
 
-            edge = default((ITile, ITile));
+            edge = default((AbstractTile, AbstractTile));
             var result = _wrappedGraph.TryGetEdge(sourceTile, targetTile, out var sEdge);
             if (result)
             {
@@ -262,7 +262,7 @@ namespace MultiRobotSimulator.Core.Models
             return result;
         }
 
-        private Exception GetException(ITile v) => new KeyNotFoundException($"Could not find tile '{v}'");
+        private Exception GetException(AbstractTile v) => new KeyNotFoundException($"Could not find tile '{v}'");
 
         #endregion Wrapped graph
     }
