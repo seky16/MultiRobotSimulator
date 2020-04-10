@@ -16,9 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Caching of tiles in `Map`
 
 ### Changed
-- Merged Map and Graph
+- Merged `Map` and `Graph`
+- Fixed corner cutting
 
 ### Removed
 
