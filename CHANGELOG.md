@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- Merged Map and Graph
 
 ### Removed
 
@@ -32,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Switched grid representation to graph using [QuickGraph](https://yaccconstructor.github.io/QuickGraph/)
 - Moved `Enums` to Core project
-- moved `MapService` to Core project and renamed to `MapFactory`
+- Moved `MapService` to Core project and renamed to `MapFactory`
 - Renamed `Tile#IsFinish` to `Tile#IsTarget`
 
 ## [0.1.0] (2020-03-03)
