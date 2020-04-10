@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -35,7 +35,7 @@ namespace MultiRobotSimulator.Core.Models
 
             foreach (var tile in _wrappedGraph.Vertices)
             {
-                RecalculateNeighbours(tile);
+                RecalculateNeighbors(tile);
             }
         }
 
@@ -54,7 +54,7 @@ namespace MultiRobotSimulator.Core.Models
             {
                 case DrawingMode.Obstacle:
                     tile.Passable = false;
-                    _wrappedGraph.ClearAdjacentEdges(tile);
+                    RecalculateNeighbors(tile);
                     break;
 
                 case DrawingMode.Start:
@@ -83,15 +83,13 @@ namespace MultiRobotSimulator.Core.Models
 
             foreach (var tile in _wrappedGraph.Vertices)
             {
-                RecalculateNeighbours(tile);
+                RecalculateNeighbors(tile);
             }
 
             return result;
         }
 
-        public IEnumerable<Tile> GetCornerNeighbours(Tile tile) => _wrappedGraph.AdjacentVertices(tile).Where(t => !(t.X == tile.X || t.Y == tile.Y));
-
-        public IEnumerable<Tile> GetPerpendicularNeighbours(Tile tile) => _wrappedGraph.AdjacentVertices(tile).Where(t => t.X == tile.X || t.Y == tile.Y);
+        public IEnumerable<Tile> GetNeighbors(Tile tile) => _wrappedGraph.Vertices.Where(t => t != tile && (Math.Abs(t.X - tile.X) <= 1 && Math.Abs(t.Y - tile.Y) <= 1));
 
         public string GetString()
         {
@@ -130,32 +128,46 @@ namespace MultiRobotSimulator.Core.Models
         {
             var result = tile.SetToDefault();
 
-            RecalculateNeighbours(tile);
+            RecalculateNeighbors(tile);
 
             return result;
         }
 
-        private void RecalculateNeighbours(Tile tile)
+        private void RecalculateNeighbors(Tile tile)
         {
-            var foo = _wrappedGraph.AdjacentVertices(tile);
+            var n = GetNeighbors(tile).Append(tile);
 
             _wrappedGraph.ClearAdjacentEdges(tile);
 
-            var corners = new List<Tile>(4);
-
-            // TODO dont allow to cut corners
-            for (var yOffset = -1; yOffset <= 1; yOffset++)
+            if (!tile.Passable)
             {
-                for (var xOffset = -1; xOffset <= 1; xOffset++)
+                // obstacle - don't allow to cut corners
+                var p = n.Where(t => t.IsPerpendicularNeighbour(tile));
+                foreach ((var t1, var t2) in p.Pairs())
                 {
-                    if (GetTileAtPos(tile.X + xOffset, tile.Y + yOffset) is Tile neighbour && neighbour != tile && neighbour.Passable)
+                    if (_wrappedGraph.TryGetEdge(t1, t2, out var edge))
                     {
-                        if (xOffset != 0 && yOffset != 0)
+                        _wrappedGraph.RemoveEdge(edge);
+                    }
+                }
+            }
+            else
+            {
+                // insert edges for all neighbors
+                foreach ((var t1, var t2) in n.Pairs())
+                {
+                    if (t1.IsPerpendicularNeighbour(t2) && t1.Passable && t2.Passable)
+                    {
+                        // perpendicular - simple check
+                        _wrappedGraph.AddEdge(new SEdge<Tile>(t1, t2));
+                    }
+                    else if (t1.IsCornerNeighbour(t2) && t1.Passable && t2.Passable)
+                    {
+                        // corner - don't allow to cut corners
+                        if (n.Where(t => t.IsPerpendicularNeighbour(t1) && t.IsPerpendicularNeighbour(t2)).Count(t => t.Passable) == 2)
                         {
-                            corners.Add(neighbour);
+                            _wrappedGraph.AddEdge(new SEdge<Tile>(t1, t2));
                         }
-
-                        _wrappedGraph.AddEdge(new SEdge<Tile>(tile, neighbour));
                     }
                 }
             }
@@ -164,10 +176,10 @@ namespace MultiRobotSimulator.Core.Models
         #region Wrapped graph
 
         private readonly UndirectedGraph<Tile, SEdge<Tile>> _wrappedGraph;
-        public IEnumerable<(ITile, ITile)> Edges => _wrappedGraph.Edges.Select(e => ((ITile)e.Source, (ITile)e.Target));
-        public IEnumerable<ITile> Vertices => _wrappedGraph.Vertices;
+        public IEnumerable<(AbstractTile, AbstractTile)> Edges => _wrappedGraph.Edges.Select(e => ((AbstractTile)e.Source, (AbstractTile)e.Target));
+        public IEnumerable<AbstractTile> Vertices => _wrappedGraph.Vertices;
 
-        public int AdjacentDegree(ITile v)
+        public int AdjacentDegree(AbstractTile v)
         {
             if (!(v is Tile tile))
                 throw GetException(v);
