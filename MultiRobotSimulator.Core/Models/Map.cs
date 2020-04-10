@@ -19,6 +19,8 @@ namespace MultiRobotSimulator.Core.Models
 
         public const string WidthStr = "width ";
 
+        private readonly Dictionary<(int x, int y), AbstractTile> _tileCache = new Dictionary<(int x, int y), AbstractTile>();
+
         public Map(int width, int height)
         {
             Width = width;
@@ -30,12 +32,27 @@ namespace MultiRobotSimulator.Core.Models
                 {
                     var tile = new Tile() { X = x, Y = y };
                     _wrappedGraph.AddVertex(tile);
+                    _tileCache.Add((x, y), tile);
                 }
             }
 
             foreach (var tile in _wrappedGraph.Vertices)
             {
-                RecalculateNeighbors(tile);
+                for (var yOffset = -1; yOffset <= 1; yOffset++)
+                {
+                    for (var xOffset = -1; xOffset <= 1; xOffset++)
+                    {
+                        if (GetTileAtPos(tile.X + xOffset, tile.Y + yOffset) is Tile neighbour && neighbour != tile)
+                        {
+                            _wrappedGraph.AddEdge(new SEdge<Tile>(tile, neighbour));
+                        }
+                    }
+                }
+            }
+
+            foreach (var obs in _wrappedGraph.Vertices.Where(t => !t.Passable))
+            {
+                RecalculateNeighbors(obs);
             }
         }
 
@@ -89,7 +106,19 @@ namespace MultiRobotSimulator.Core.Models
             return result;
         }
 
-        public IEnumerable<Tile> GetNeighbors(Tile tile) => _wrappedGraph.Vertices.Where(t => t != tile && (Math.Abs(t.X - tile.X) <= 1 && Math.Abs(t.Y - tile.Y) <= 1));
+        public IEnumerable<Tile> GetNeighbors(Tile tile)
+        {
+            for (var yOffset = -1; yOffset <= 1; yOffset++)
+            {
+                for (var xOffset = -1; xOffset <= 1; xOffset++)
+                {
+                    if (GetTileAtPos(tile.X + xOffset, tile.Y + yOffset) is Tile neighbour && neighbour != tile)
+                    {
+                        yield return neighbour;
+                    }
+                }
+            }
+        }
 
         public string GetString()
         {
@@ -122,7 +151,7 @@ namespace MultiRobotSimulator.Core.Models
             return sb.ToString();
         }
 
-        public AbstractTile? GetTileAtPos(int x, int y) => _wrappedGraph.Vertices.SingleOrDefault(t => t.X == x && t.Y == y);
+        public AbstractTile? GetTileAtPos(int x, int y) => _tileCache.TryGetValue((x, y), out var tile) ? tile : null;
 
         public bool RemoveFromTile(Tile tile)
         {
@@ -133,44 +162,63 @@ namespace MultiRobotSimulator.Core.Models
             return result;
         }
 
+        private bool AddEdge(Tile source, Tile target)
+        {
+            if (_wrappedGraph.ContainsEdge(source, target) || !source.Passable || !target.Passable)
+            {
+                return false;
+            }
+
+            var n = GetNeighbors(source);
+            if (!n.Contains(target))
+            {
+                return false;
+            }
+
+            if (source.IsCornerNeighbour(target) && n.Count(t => t.IsPerpendicularNeighbour(target) && t.Passable) != 2)
+            {
+                return false;
+            }
+
+            return _wrappedGraph.AddEdge(new SEdge<Tile>(source, target));
+        }
+
         private void RecalculateNeighbors(Tile tile)
         {
-            var n = GetNeighbors(tile).Append(tile);
-
-            _wrappedGraph.ClearAdjacentEdges(tile);
+            var n = GetNeighbors(tile);
+            var p = n.Where(t => t.IsPerpendicularNeighbour(tile));
 
             if (!tile.Passable)
             {
-                // obstacle - don't allow to cut corners
-                var p = n.Where(t => t.IsPerpendicularNeighbour(tile));
+                _wrappedGraph.ClearAdjacentEdges(tile);
+
+                // don't allow to cut corners
                 foreach ((var t1, var t2) in p.Pairs())
                 {
-                    if (_wrappedGraph.TryGetEdge(t1, t2, out var edge))
-                    {
-                        _wrappedGraph.RemoveEdge(edge);
-                    }
+                    RemoveEdge(t1, t2);
                 }
             }
             else
             {
-                // insert edges for all neighbors
-                foreach ((var t1, var t2) in n.Pairs())
+                foreach (var neighbor in n.Where(t => t.Passable))
                 {
-                    if (t1.IsPerpendicularNeighbour(t2) && t1.Passable && t2.Passable)
-                    {
-                        // perpendicular - simple check
-                        _wrappedGraph.AddEdge(new SEdge<Tile>(t1, t2));
-                    }
-                    else if (t1.IsCornerNeighbour(t2) && t1.Passable && t2.Passable)
-                    {
-                        // corner - don't allow to cut corners
-                        if (n.Where(t => t.IsPerpendicularNeighbour(t1) && t.IsPerpendicularNeighbour(t2)).Count(t => t.Passable) == 2)
-                        {
-                            _wrappedGraph.AddEdge(new SEdge<Tile>(t1, t2));
-                        }
-                    }
+                    AddEdge(tile, neighbor);
+                }
+
+                foreach ((var t1, var t2) in p.Pairs())
+                {
+                    AddEdge(t1, t2);
                 }
             }
+        }
+
+        private bool RemoveEdge(Tile source, Tile target)
+        {
+            if (_wrappedGraph.TryGetEdge(source, target, out var edge))
+            {
+                return _wrappedGraph.RemoveEdge(edge);
+            }
+            return false;
         }
 
         #region Wrapped graph
