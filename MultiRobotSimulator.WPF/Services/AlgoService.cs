@@ -49,11 +49,11 @@ namespace MultiRobotSimulator.WPF.Services
             {
                 var sw = Stopwatch.StartNew();
                 dotnetAlgo.Initialize(graph);
-                _logger.LogInformation("dotnet init took {ms} ms", sw.ElapsedMilliseconds);
+                _logger.LogInformation("{action} took {ms} ms", "dotnet init", sw.ElapsedMilliseconds);
 
                 sw.Restart();
                 dotnetAlgo.RunSearch();
-                _logger.LogInformation("dotnet search took {ms} ms", sw.ElapsedMilliseconds);
+                _logger.LogInformation("{action} took {ms} ms", "dotnet search", sw.ElapsedMilliseconds);
             }
             else
             {

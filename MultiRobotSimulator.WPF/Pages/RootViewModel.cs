@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using Microsoft.Extensions.Logging;
@@ -124,11 +125,14 @@ namespace MultiRobotSimulator.WPF.Pages
             {
                 _logger.LogInformation("Opening file '{fullPath}'", path);
 
+                var sw = Stopwatch.StartNew();
+
                 var textReader = _ioService.OpenTextFile(path);
 
                 tab = _editorTabFactory();
                 tab.FullPath = path;
                 tab.Map = _mapFactory.FromText(textReader);
+                _logger.LogInformation("{action} took {ms} ms", "Opening", sw.ElapsedMilliseconds);
 
                 Items.Add(tab);
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace MultiRobotSimulator.Abstractions
 {
@@ -17,22 +16,22 @@ namespace MultiRobotSimulator.Abstractions
 
         #region IComparable, IEquatable overrides
 
-        public static bool operator !=(AbstractTile left, AbstractTile right)
+        public static bool operator !=(AbstractTile? left, AbstractTile? right)
         {
             return !(left == right);
         }
 
-        public static bool operator <(AbstractTile left, AbstractTile right)
+        public static bool operator <(AbstractTile? left, AbstractTile? right)
         {
             return left is null ? right is object : left.CompareTo(right) < 0;
         }
 
-        public static bool operator <=(AbstractTile left, AbstractTile right)
+        public static bool operator <=(AbstractTile? left, AbstractTile? right)
         {
             return left is null || left.CompareTo(right) <= 0;
         }
 
-        public static bool operator ==(AbstractTile left, AbstractTile right)
+        public static bool operator ==(AbstractTile? left, AbstractTile? right)
         {
             if (left is null)
             {
@@ -42,12 +41,12 @@ namespace MultiRobotSimulator.Abstractions
             return left.Equals(right);
         }
 
-        public static bool operator >(AbstractTile left, AbstractTile right)
+        public static bool operator >(AbstractTile? left, AbstractTile? right)
         {
             return left is object && left.CompareTo(right) > 0;
         }
 
-        public static bool operator >=(AbstractTile left, AbstractTile right)
+        public static bool operator >=(AbstractTile? left, AbstractTile? right)
         {
             return left is null ? right is null : left.CompareTo(right) >= 0;
         }
@@ -62,7 +61,7 @@ namespace MultiRobotSimulator.Abstractions
             return CompareTo(tile);
         }
 
-        public int CompareTo([AllowNull] AbstractTile other)
+        public int CompareTo(AbstractTile? other)
         {
             if (other is null)
             {
@@ -94,7 +93,7 @@ namespace MultiRobotSimulator.Abstractions
             }
         }
 
-        public bool Equals([AllowNull] AbstractTile other)
+        public bool Equals(AbstractTile? other)
         {
             if (ReferenceEquals(this, other))
             {

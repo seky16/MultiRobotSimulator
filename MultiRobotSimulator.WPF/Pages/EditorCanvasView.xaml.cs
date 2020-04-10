@@ -19,7 +19,7 @@ namespace MultiRobotSimulator.WPF.Pages
         private readonly DrawingGroup _backingStore = new DrawingGroup();
         private readonly ILogger<EditorCanvasView> _logger;
         private readonly Typeface _typeface = new Typeface("Arial");
-        private RootViewModel _rootVM;
+        private RootViewModel? _rootVM;
         private EditorTabViewModel? _tab;
 
         public EditorCanvasView(IEventAggregator eventAggregator, ILogger<EditorCanvasView> logger)
@@ -44,7 +44,7 @@ namespace MultiRobotSimulator.WPF.Pages
 
         private void HandleMouse(MouseEventArgs e)
         {
-            if (_tab is null)
+            if (_tab is null || _rootVM is null)
             {
                 return;
             }
@@ -91,7 +91,7 @@ namespace MultiRobotSimulator.WPF.Pages
             drawingContext.Close();
             sw.Stop();
 
-            _logger.LogTrace("Render took {milliseconds} ms", sw.ElapsedMilliseconds);
+            _logger.LogTrace("{action} took {ms} ms", "Render", sw.ElapsedMilliseconds);
         }
 
         private void Render(DrawingContext drawingContext)
@@ -137,7 +137,7 @@ namespace MultiRobotSimulator.WPF.Pages
 
         private void RenderGraph(DrawingContext drawingContext)
         {
-            if (!_rootVM.RenderGraph || _tab is null)
+            if (_rootVM?.RenderGraph != true || _tab is null)
             {
                 return;
             }
