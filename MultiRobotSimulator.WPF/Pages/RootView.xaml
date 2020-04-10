@@ -73,6 +73,8 @@
                                         <RadioButton IsChecked="{Binding DrawingMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static enums:DrawingMode.Target}}" Content="Target" />
                                     </StackPanel>
                                 </GroupBox>
+                                <Border BorderThickness="3" BorderBrush="Transparent" />
+                                <CheckBox IsChecked="{Binding RenderGraph}">Render graph (debug)</CheckBox>
                             </WrapPanel>
                         </Border>
                     </TabItem>

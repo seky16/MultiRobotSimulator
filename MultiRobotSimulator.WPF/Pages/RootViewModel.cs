@@ -23,6 +23,7 @@ namespace MultiRobotSimulator.WPF.Pages
         private readonly Func<NewFileDialogViewModel> _newFileDialogFactory;
         private readonly IWindowManager _windowManager;
         private DrawingMode _drawingMode;
+        private bool _renderGraph;
         private Guid _selectedAlgo;
         private int untitledIndex = 0;
 
@@ -58,6 +59,16 @@ namespace MultiRobotSimulator.WPF.Pages
         }
 
         public bool HasOpenTabs => Items.Count > 0;
+
+        public bool RenderGraph
+        {
+            get { return _renderGraph; }
+            set
+            {
+                SetAndNotify(ref _renderGraph, value);
+                _eventAggregator.Publish(new CanvasRedrawEvent());
+            }
+        }
 
         public Guid SelectedAlgo
         {

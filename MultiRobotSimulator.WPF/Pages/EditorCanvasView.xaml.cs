@@ -19,6 +19,7 @@ namespace MultiRobotSimulator.WPF.Pages
         private readonly DrawingGroup _backingStore = new DrawingGroup();
         private readonly ILogger<EditorCanvasView> _logger;
         private readonly Typeface _typeface = new Typeface("Arial");
+        private RootViewModel _rootVM;
         private EditorTabViewModel? _tab;
 
         public EditorCanvasView(IEventAggregator eventAggregator, ILogger<EditorCanvasView> logger)
@@ -72,7 +73,7 @@ namespace MultiRobotSimulator.WPF.Pages
 
             if (editorAction == EditorAction.Add)
             {
-                var drawingMode = ((RootViewModel)_tab.Parent).DrawingMode;
+                var drawingMode = _rootVM.DrawingMode;
                 _tab.HasChanges |= _tab.Map.AddToTile(tile, drawingMode);
             }
 
@@ -128,9 +129,32 @@ namespace MultiRobotSimulator.WPF.Pages
             }
 
             RenderTiles(drawingContext);
+            RenderGraph(drawingContext);
 
             // pop back guidelines set
             drawingContext.Pop();
+        }
+
+        private void RenderGraph(DrawingContext drawingContext)
+        {
+            if (!_rootVM.RenderGraph || _tab is null)
+            {
+                return;
+            }
+
+            var graph = _tab.Map;
+            var edges = graph.Edges;
+            var pen = new Pen(Brushes.Purple, 1);
+
+            foreach ((var t1, var t2) in edges)
+            {
+                if (!(t1 is Tile tile1) || !(t2 is Tile tile2))
+                {
+                    continue;
+                }
+
+                drawingContext.DrawLine(pen, tile1.GetRect(CellSize).Center(), tile2.GetRect(CellSize).Center());
+            }
         }
 
         private void RenderTiles(DrawingContext drawingContext)
@@ -230,6 +254,7 @@ namespace MultiRobotSimulator.WPF.Pages
             if (e.NewValue is EditorCanvasViewModel editorCanvasViewModel)
             {
                 _tab = editorCanvasViewModel.EditorTab;
+                _rootVM = (RootViewModel)_tab.Parent;
 
                 editorCanvasViewModel.ResizeEventHandler = OnResize;
 
