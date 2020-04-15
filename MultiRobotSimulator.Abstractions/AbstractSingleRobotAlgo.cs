@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -32,6 +32,7 @@ namespace MultiRobotSimulator.Abstractions
         public bool Initialized { get; private set; }
         public abstract string Name { get; }
         public List<AbstractTile> Path { get; private set; }
+        public bool PathFound => Path?.Count > 0 && Path[0] == Start && Path[^1] == Target;
 
         public AbstractTile Start
         {

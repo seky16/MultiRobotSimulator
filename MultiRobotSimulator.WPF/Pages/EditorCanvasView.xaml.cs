@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Extensions.Logging;
+using MultiRobotSimulator.Abstractions;
 using MultiRobotSimulator.Core.Enums;
 using MultiRobotSimulator.Core.Models;
 using MultiRobotSimulator.WPF.Events;
@@ -19,6 +21,7 @@ namespace MultiRobotSimulator.WPF.Pages
         private readonly DrawingGroup _backingStore = new DrawingGroup();
         private readonly ILogger<EditorCanvasView> _logger;
         private readonly Typeface _typeface = new Typeface("Arial");
+        private IEnumerable<AbstractTile>? _path;
         private RootViewModel? _rootVM;
         private EditorTabViewModel? _tab;
 
@@ -131,6 +134,8 @@ namespace MultiRobotSimulator.WPF.Pages
             RenderTiles(drawingContext);
             RenderGraph(drawingContext);
 
+            RenderPath(drawingContext);
+
             // pop back guidelines set
             drawingContext.Pop();
         }
@@ -154,6 +159,25 @@ namespace MultiRobotSimulator.WPF.Pages
                 }
 
                 drawingContext.DrawLine(pen, tile1.GetRect(CellSize).Center(), tile2.GetRect(CellSize).Center());
+            }
+        }
+
+        private void RenderPath(DrawingContext drawingContext)
+        {
+            if (_path?.Any() != true)
+            {
+                return;
+            }
+
+            var pen = new Pen(Brushes.Blue, 1);
+
+            var source = _path.First();
+
+            for (var i = 1; i < _path.Count(); i++)
+            {
+                var target = _path.ElementAt(i);
+                drawingContext.DrawLine(pen, source.GetRect(CellSize).Center(), target.GetRect(CellSize).Center());
+                source = target;
             }
         }
 
@@ -223,6 +247,11 @@ namespace MultiRobotSimulator.WPF.Pages
 
         public void Handle(CanvasRedrawEvent message)
         {
+            //if (message.Path != null)
+            //{
+            _path = message.Path;
+            //}
+
             Render();
         }
 

@@ -1,20 +1,24 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using MultiRobotSimulator.Abstractions;
+using MultiRobotSimulator.WPF.Events;
+using Stylet;
 using StyletIoC;
 
 namespace MultiRobotSimulator.WPF.Services
 {
     public class AlgoService
     {
+        private readonly IEventAggregator _eventAggregator;
         private readonly ILogger<AlgoService> _logger;
 
-        public AlgoService(IContainer container, ILogger<AlgoService> logger)
+        public AlgoService(IContainer container, ILogger<AlgoService> logger, IEventAggregator eventAggregator)
         {
             _logger = logger;
+            _eventAggregator = eventAggregator;
 
             // dotnet
             DotnetAlgos = container.GetAll<IAlgo>().ToDictionary(_ => Guid.NewGuid());
@@ -54,11 +58,26 @@ namespace MultiRobotSimulator.WPF.Services
                 sw.Restart();
                 dotnetAlgo.RunSearch();
                 _logger.LogInformation("{action} took {ms} ms", "dotnet search", sw.ElapsedMilliseconds);
+
+                if (dotnetAlgo is AbstractSingleRobotAlgo singleRobotAlgo)
+                {
+                    /*if (!singleRobotAlgo.PathFound)
+                    {
+                        throw GetPathNotFoundException(singleRobotAlgo);
+                    }*/
+
+                    _eventAggregator.Publish(new CanvasRedrawEvent(singleRobotAlgo.Path));
+                }
             }
             else
             {
                 throw new KeyNotFoundException($"Could not find algorithm with guid '{guid}'");
             }
+        }
+
+        private Exception GetPathNotFoundException(AbstractSingleRobotAlgo singleRobotAlgo)
+        {
+            return new InvalidOperationException($"Path from '{singleRobotAlgo.Start}' to '{singleRobotAlgo.Target}' was not found.");
         }
     }
 }

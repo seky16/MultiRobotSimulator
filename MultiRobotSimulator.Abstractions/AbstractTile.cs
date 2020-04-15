@@ -128,6 +128,24 @@ namespace MultiRobotSimulator.Abstractions
             return HashCode.Combine(X, Y);
         }
 
+        public override string? ToString()
+        {
+            var str = $"[{X};{Y}]";
+            if (Passable)
+            {
+                str += " Passable";
+            }
+            if (IsStart)
+            {
+                str += " Start";
+            }
+            if (IsTarget)
+            {
+                str += " Target";
+            }
+            return str;
+        }
+
         #endregion IComparable, IEquatable overrides
     }
 }
