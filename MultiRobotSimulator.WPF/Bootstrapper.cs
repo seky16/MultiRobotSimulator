@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
@@ -27,6 +28,14 @@ namespace MultiRobotSimulator.WPF
         {
             builder.Assemblies.Add(Assembly.Load("MultiRobotSimulator.Core"));
             builder.Assemblies.Add(Assembly.Load("MultiRobotSimulator.Abstractions"));
+
+            // load dotnet plugin assemblies
+            foreach (var dll in Directory.EnumerateFiles(Path.Combine(Directory.GetCurrentDirectory(), "plugins"), "*.dll"))
+            {
+                _logger.Info("Loading {dll}", dll);
+                var ass = Assembly.LoadFile(dll);
+                builder.Assemblies.Add(ass);
+            }
 
             // todo add plugin assemblies here, and add to Stylet IoC using .ToAllImplementations();
             builder.Bind<IAlgo>().ToAllImplementations();
