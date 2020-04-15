@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -48,7 +48,7 @@ namespace MultiRobotSimulator.WPF.Services
             if (DotnetAlgos.TryGetValue(guid, out var dotnetAlgo))
             {
                 var sw = Stopwatch.StartNew();
-                dotnetAlgo.Initialize(graph);
+                dotnetAlgo.InitializeInternal(graph);
                 _logger.LogInformation("{action} took {ms} ms", "dotnet init", sw.ElapsedMilliseconds);
 
                 sw.Restart();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,7 +14,6 @@ namespace MultiRobotSimulator.Abstractions
 
         protected AbstractSingleRobotAlgo()
         {
-            Path = new List<AbstractTile>();
         }
 
         public IGraph Graph
@@ -31,10 +30,8 @@ namespace MultiRobotSimulator.Abstractions
         }
 
         public bool Initialized { get; private set; }
-
         public abstract string Name { get; }
-
-        public List<AbstractTile> Path { get; }
+        public List<AbstractTile> Path { get; private set; }
 
         public AbstractTile Start
         {
@@ -62,7 +59,11 @@ namespace MultiRobotSimulator.Abstractions
             private set { target = value; }
         }
 
-        public void Initialize(IGraph graph)
+        public virtual void Initialize()
+        {
+        }
+
+        public void InitializeInternal(IGraph graph)
         {
             Initialized = true;
             Graph = graph;
@@ -94,6 +95,10 @@ namespace MultiRobotSimulator.Abstractions
             {
                 Target = targets.Single();
             }
+
+            Path = new List<AbstractTile>();
+
+            Initialize();
         }
 
         public abstract void RunSearch();

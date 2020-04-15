@@ -7,11 +7,18 @@ namespace MultiRobotSimulator.Core
 {
     public class DijkstraAlgo : AbstractSingleRobotAlgo
     {
-        private readonly Dictionary<AbstractTile, double> dist = new Dictionary<AbstractTile, double>();
-        private readonly Dictionary<AbstractTile, AbstractTile?> prev = new Dictionary<AbstractTile, AbstractTile?>();
-        private readonly List<AbstractTile> Q = new List<AbstractTile>();
+        private Dictionary<AbstractTile, double> dist;
+        private Dictionary<AbstractTile, AbstractTile?> prev;
+        private List<AbstractTile> Q;
 
         public override string Name => "Dijkstra's algorithm";
+
+        public override void Initialize()
+        {
+            dist = new Dictionary<AbstractTile, double>();
+            prev = new Dictionary<AbstractTile, AbstractTile?>();
+            Q = new List<AbstractTile>();
+        }
 
         public override void RunSearch()
         {
@@ -41,7 +48,7 @@ namespace MultiRobotSimulator.Core
                 {
                     if (!Q.Contains(v)) continue;
 
-                    var alt = dist[u] + 1;
+                    var alt = dist[u] + Helpers.Metrics.Euclidean(u, v);
 
                     if (alt < dist[v])
                     {

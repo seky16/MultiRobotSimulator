@@ -5,7 +5,7 @@
         IGraph Graph { get; }
         string Name { get; }
 
-        void Initialize(IGraph graph);
+        void InitializeInternal(IGraph graph);
 
         void RunSearch();
     }
