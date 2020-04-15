@@ -28,3 +28,5 @@ TODO
 6. Build your project
 7. Copy built `.dll` to `<appFolder>\plugins`
 8. Run the app. Your algorithm should appear in dropdown.
+
+> **Note:** Constructor is only run once, during application startup. Use `Initialize()` for set-up code you need to run before each search.
