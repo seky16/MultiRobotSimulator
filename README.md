@@ -14,11 +14,11 @@ Code for diploma thesis *Path planning for multiple robots*.
 - [ ] Documentation
 - [ ] Benchmarking
 - Support for algorithms as external plugins
-  - [ ] [dotnet](https://docs.microsoft.com/en-us/dotnet/core/tutorials/creating-app-with-plugin-support)
+  - [x] [dotnet](https://docs.microsoft.com/en-us/dotnet/core/tutorials/creating-app-with-plugin-support)
   - [ ] [Python](https://stackoverflow.com/a/53612533)
   - [ ] [Lua](https://www.moonsharp.org/)
   - [ ] [JavaScript](https://github.com/Microsoft/ClearScript)
 - Path-planning algorithms
-  - [ ] [Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)
+  - [x] [Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)
   - [ ] [A*](https://en.wikipedia.org/wiki/A*_search_algorithm) + COOP A* or other multi-agent variant
   - [ ] [PSO](https://en.wikipedia.org/wiki/Particle_swarm_optimization) variants

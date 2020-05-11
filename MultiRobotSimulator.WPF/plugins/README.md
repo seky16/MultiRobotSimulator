@@ -16,6 +16,7 @@ Supported plugins:
     <Private>false</Private>
 </Reference>
 ```
+in your `.csproj` file
 3. Create new class inheriting from `AbstractSingleRobotAlgo`, `AbstractMultiRobotAlgo` or `IAlgo` (advanced)
 4. Implement required overrides:
 
@@ -27,6 +28,6 @@ TODO
 
 6. Build your project
 7. Copy built `.dll` to `<appFolder>\plugins`
-8. Run the app. Your algorithm should appear in dropdown.
+8. Run the app. Your algorithm should appear in dropdown
 
-> **Note:** Constructor is only run once, during application startup. Use `Initialize()` for set-up code you need to run before each search.
+> **Note:** Constructor is only run once (during application startup). Use `Initialize()` for set-up code you need to run before each search.
