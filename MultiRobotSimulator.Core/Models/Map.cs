@@ -21,6 +21,9 @@ namespace MultiRobotSimulator.Core.Models
 
         private readonly Dictionary<(int x, int y), AbstractTile> _tileCache = new Dictionary<(int x, int y), AbstractTile>();
 
+        public List<Tile> Starts { get; } = new List<Tile>();
+        public List<Tile> Targets { get; } = new List<Tile>();
+
         public Map(int width, int height)
         {
             Width = width;
@@ -76,10 +79,12 @@ namespace MultiRobotSimulator.Core.Models
 
                 case DrawingMode.Start:
                     tile.IsStart = true;
+                    Starts.Add(tile);
                     break;
 
                 case DrawingMode.Target:
                     tile.IsTarget = true;
+                    Targets.Add(tile);
                     break;
 
                 default:
@@ -156,6 +161,16 @@ namespace MultiRobotSimulator.Core.Models
         public bool RemoveFromTile(Tile tile)
         {
             var result = tile.SetToDefault();
+
+            if (Starts.Contains(tile))
+            {
+                Starts.Remove(tile);
+            }
+
+            if (Targets.Contains(tile))
+            {
+                Targets.Remove(tile);
+            }
 
             RecalculateNeighbors(tile);
 

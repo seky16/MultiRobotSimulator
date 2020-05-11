@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -20,6 +20,7 @@ namespace MultiRobotSimulator.WPF.Pages
     {
         private readonly DrawingGroup _backingStore = new DrawingGroup();
         private readonly ILogger<EditorCanvasView> _logger;
+        private readonly double _pixelsPerDip = 1;
         private readonly Typeface _typeface = new Typeface("Arial");
         private IEnumerable<AbstractTile>? _path;
         private RootViewModel? _rootVM;
@@ -31,18 +32,23 @@ namespace MultiRobotSimulator.WPF.Pages
 
             eventAggregator.Subscribe(this);
             _logger = logger;
+            _pixelsPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
         }
 
         public double CellSize { get; private set; }
 
-        private FormattedText GetFormattedText(object text)
+        private void DrawTextAtCenter(DrawingContext drawingContext, object text, Point center)
         {
-            return new FormattedText(text.ToString(), CultureInfo.CurrentUICulture, FlowDirection.LeftToRight, _typeface, 12, Brushes.Black, null, TextFormattingMode.Display, VisualTreeHelper.GetDpi(this).PixelsPerDip)
+            var str = text.ToString() ?? string.Empty;
+            var size = CellSize * (3d / 4) * Math.Min(0.9, 2d / str.Length); // experimental values
+
+            var formattedText = new FormattedText(str.Trim(), CultureInfo.CurrentUICulture, FlowDirection.LeftToRight, _typeface, size, Brushes.Black, null, TextFormattingMode.Display, _pixelsPerDip)
             {
-                TextAlignment = TextAlignment.Center,
                 MaxTextHeight = CellSize,
                 MaxTextWidth = CellSize
             };
+            var origin = new Point(center.X - (formattedText.WidthIncludingTrailingWhitespace / 2), center.Y - (formattedText.Height / 2));
+            drawingContext.DrawText(formattedText, origin);
         }
 
         private void HandleMouse(MouseEventArgs e)
@@ -193,20 +199,20 @@ namespace MultiRobotSimulator.WPF.Pages
                 drawingContext.DrawRectangle(Brushes.Black, null, obstacle.GetRect(CellSize));
             }
 
-            var starts = _tab.Map.Vertices.Where(t => t.IsStart);
-            for (var i = 0; i < starts.Count(); i++)
+            for (var i = 0; i < _tab.Map.Starts.Count; i++)
             {
-                var rect = starts.ElementAt(i).GetRect(CellSize);
-                drawingContext.DrawEllipse(Brushes.Green, null, rect.Center(), CellSize / 2, CellSize / 2);
-                drawingContext.DrawText(GetFormattedText(i + 1), rect.TopLeft);
+                var rect = _tab.Map.Starts[i].GetRect(CellSize);
+                var center = rect.Center();
+                drawingContext.DrawEllipse(Brushes.Green, null, center, CellSize / 2, CellSize / 2);
+                DrawTextAtCenter(drawingContext, i + 1, center);
             }
 
-            var finishes = _tab.Map.Vertices.Where(t => t.IsTarget);
-            for (var j = 0; j < finishes.Count(); j++)
+            for (var j = 0; j < _tab.Map.Targets.Count; j++)
             {
-                var rect = finishes.ElementAt(j).GetRect(CellSize);
-                drawingContext.DrawEllipse(Brushes.Red, null, rect.Center(), CellSize / 2, CellSize / 2);
-                drawingContext.DrawText(GetFormattedText(j + 1), rect.TopLeft);
+                var rect = _tab.Map.Targets[j].GetRect(CellSize);
+                var center = rect.Center();
+                drawingContext.DrawEllipse(Brushes.Red, null, center, CellSize / 2, CellSize / 2);
+                DrawTextAtCenter(drawingContext, j + 1, center);
             }
         }
 
