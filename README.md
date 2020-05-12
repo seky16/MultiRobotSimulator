@@ -5,9 +5,9 @@ Code for diploma thesis *Path planning for multiple robots*.
 ## Features
 
 - Path-planning
-  - [ ] Single robot
+  - [x] Single robot
   - [ ] Multiple robots to single target
-  - [ ] Multiple robots to multiple targets
+  - [x] Multiple robots to multiple targets
 - [x] Support for saving/loading `.map` files ([MovingAI](https://www.movingai.com/benchmarks/formats.html))
 - [x] Logging
 - [ ] Tests
