@@ -1,5 +1,4 @@
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -8,7 +7,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Extensions.Logging;
-using MultiRobotSimulator.Abstractions;
 using MultiRobotSimulator.Core.Enums;
 using MultiRobotSimulator.Core.Models;
 using MultiRobotSimulator.WPF.Events;
@@ -22,7 +20,6 @@ namespace MultiRobotSimulator.WPF.Pages
         private readonly ILogger<EditorCanvasView> _logger;
         private readonly double _pixelsPerDip = 1;
         private readonly Typeface _typeface = new Typeface("Arial");
-        private IEnumerable<AbstractTile>? _path;
         private RootViewModel? _rootVM;
         private EditorTabViewModel? _tab;
 
@@ -91,7 +88,12 @@ namespace MultiRobotSimulator.WPF.Pages
 
         private void Render()
         {
-            _logger.LogTrace("Canvas render");
+            if (_tab != _rootVM?.ActiveItem)
+            {
+                return;
+            }
+
+            _logger.LogTrace("Canvas render '{name}'", _tab?.DisplayName);
 
             var sw = Stopwatch.StartNew();
             // https://stackoverflow.com/a/44426783
@@ -140,7 +142,10 @@ namespace MultiRobotSimulator.WPF.Pages
             RenderTiles(drawingContext);
             RenderGraph(drawingContext);
 
-            RenderPath(drawingContext);
+            if (_rootVM?.RenderPaths ?? false)
+            {
+                RenderPath(drawingContext);
+            }
 
             // pop back guidelines set
             drawingContext.Pop();
@@ -170,20 +175,25 @@ namespace MultiRobotSimulator.WPF.Pages
 
         private void RenderPath(DrawingContext drawingContext)
         {
-            if (_path?.Any() != true)
+            var paths = _rootVM?.AlgoResult?.Paths;
+            if (paths is null || paths.Count == 0)
             {
                 return;
             }
 
             var pen = new Pen(Brushes.Blue, 1);
-
-            var source = _path.First();
-
-            for (var i = 1; i < _path.Count(); i++)
+            foreach (var path in paths)
             {
-                var target = _path.ElementAt(i);
-                drawingContext.DrawLine(pen, source.GetRect(CellSize).Center(), target.GetRect(CellSize).Center());
-                source = target;
+                if (path.Count == 0) continue;
+
+                var source = path.First();
+
+                for (var i = 1; i < path.Count; i++)
+                {
+                    var target = path.ElementAt(i);
+                    drawingContext.DrawLine(pen, source.GetRect(CellSize).Center(), target.GetRect(CellSize).Center());
+                    source = target;
+                }
             }
         }
 
@@ -253,11 +263,6 @@ namespace MultiRobotSimulator.WPF.Pages
 
         public void Handle(CanvasRedrawEvent message)
         {
-            //if (message.Path != null)
-            //{
-            _path = message.Path;
-            //}
-
             Render();
         }
 

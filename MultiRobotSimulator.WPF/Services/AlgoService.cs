@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using MultiRobotSimulator.Abstractions;
+using MultiRobotSimulator.Core.Models;
 using MultiRobotSimulator.WPF.Events;
 using Stylet;
 using StyletIoC;
@@ -45,39 +46,36 @@ namespace MultiRobotSimulator.WPF.Services
         public Dictionary<Guid, string> DisplayNames { get; } = new Dictionary<Guid, string>();
         public Dictionary<Guid, IAlgo> DotnetAlgos { get; }
 
-        internal void RunSearch(Guid guid, IGraph graph)
+        internal void RunSearch(Guid guid, Map graph)
         {
             _logger.LogInformation("Begin search with algorithm {name} (graph V={nodes}, E={edges})", DisplayNames[guid], graph.Vertices.Count(), graph.Edges.Count());
 
             if (DotnetAlgos.TryGetValue(guid, out var dotnetAlgo))
             {
                 var sw = Stopwatch.StartNew();
-                dotnetAlgo.InitializeInternal(graph);
+
+                var robots = new List<Robot>();
+                for (var i = 0; i < graph.Starts.Count; i++)
+                {
+                    robots.Add(new Robot(graph.Starts[i], graph.Targets[i]));
+                }
+
+                dotnetAlgo.InitializeInternal(graph, robots);
                 _logger.LogInformation("{action} took {ms} ms", "dotnet init", sw.ElapsedMilliseconds);
 
                 sw.Restart();
                 dotnetAlgo.RunSearch();
+                sw.Stop();
                 _logger.LogInformation("{action} took {ms} ms", "dotnet search", sw.ElapsedMilliseconds);
 
-                if (dotnetAlgo is AbstractSingleRobotAlgo singleRobotAlgo)
-                {
-                    /*if (!singleRobotAlgo.PathFound)
-                    {
-                        throw GetPathNotFoundException(singleRobotAlgo);
-                    }*/
+                var result = new AlgoResult(dotnetAlgo, sw.ElapsedMilliseconds);
 
-                    _eventAggregator.Publish(new CanvasRedrawEvent(singleRobotAlgo.Path));
-                }
+                _eventAggregator.Publish(new SearchDoneEvent(result));
             }
             else
             {
                 throw new KeyNotFoundException($"Could not find algorithm with guid '{guid}'");
             }
-        }
-
-        private Exception GetPathNotFoundException(AbstractSingleRobotAlgo singleRobotAlgo)
-        {
-            return new InvalidOperationException($"Path from '{singleRobotAlgo.Start}' to '{singleRobotAlgo.Target}' was not found.");
         }
     }
 }

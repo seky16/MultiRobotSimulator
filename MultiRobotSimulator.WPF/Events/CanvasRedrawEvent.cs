@@ -1,18 +1,12 @@
-﻿using System.Collections.Generic;
-using MultiRobotSimulator.Abstractions;
-
-namespace MultiRobotSimulator.WPF.Events
+﻿namespace MultiRobotSimulator.WPF.Events
 {
     public class CanvasRedrawEvent
     {
         private readonly static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
-        public CanvasRedrawEvent(IEnumerable<AbstractTile>? path = null)
+        public CanvasRedrawEvent()
         {
-            _logger.Debug("Canvas redraw event called");
-            Path = path;
+            _logger.Debug("{event} called", nameof(CanvasRedrawEvent));
         }
-
-        public IEnumerable<AbstractTile>? Path { get; }
     }
 }

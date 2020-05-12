@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using MultiRobotSimulator.Abstractions.Helpers;
 
 namespace MultiRobotSimulator.Abstractions
 {
     public abstract class AbstractSingleRobotAlgo : IAlgo
     {
-        private IGraph? graph;
-
-        private AbstractTile? start;
-
-        private AbstractTile? target;
+        private IGraph? _graph;
 
         protected AbstractSingleRobotAlgo()
         {
@@ -20,94 +16,67 @@ namespace MultiRobotSimulator.Abstractions
         {
             get
             {
-                if (graph is null || !Initialized)
+                if (_graph is null || !Initialized)
                 {
-                    throw GetInitializationException();
+                    throw ExceptionHelper.GetInitializationException(nameof(Graph));
                 }
-                return graph;
+                return _graph;
             }
-            private set { graph = value; }
+            private set { _graph = value; }
         }
 
         public bool Initialized { get; private set; }
         public abstract string Name { get; }
-        public List<AbstractTile> Path { get; private set; }
-        public bool PathFound => Path?.Count > 0 && Path[0] == Start && Path[^1] == Target;
 
-        public AbstractTile Start
-        {
-            get
-            {
-                if (start is null || !Initialized)
-                {
-                    throw GetInitializationException();
-                }
-                return start;
-            }
-            private set { start = value; }
-        }
+        public Robot Robot => Robots.First();
 
-        public AbstractTile Target
-        {
-            get
-            {
-                if (target is null || !Initialized)
-                {
-                    throw GetInitializationException();
-                }
-                return target;
-            }
-            private set { target = value; }
-        }
+        public IReadOnlyCollection<Robot> Robots { get; private set; } = new List<Robot>();
 
-        public virtual void Initialize()
-        {
-        }
+        public abstract void Initialize();
 
-        public void InitializeInternal(IGraph graph)
+        public void InitializeInternal(IGraph graph, IReadOnlyCollection<Robot> robots)
         {
             Initialized = true;
             Graph = graph;
 
+            if (robots.Count != 1 || !(robots.ElementAt(0) is Robot robot))
+            {
+                throw ExceptionHelper.GetInitializationException(nameof(Robot));
+            }
+
             var starts = graph.Vertices.Where(t => t.IsStart);
             if (!starts.Any())
             {
-                throw GetNotFoundException(nameof(Start));
+                throw ExceptionHelper.GetNotFoundException(nameof(robot.Start));
             }
             else if (starts.Count() > 1)
             {
-                throw GetSingleException(nameof(Start));
+                throw ExceptionHelper.GetNonSingleException(nameof(robot.Start));
             }
-            else
+            else if (starts.Single() != robot.Start)
             {
-                Start = starts.Single();
+                throw ExceptionHelper.GetInitializationException(nameof(robot.Start));
             }
 
             var targets = graph.Vertices.Where(t => t.IsTarget);
             if (!targets.Any())
             {
-                throw GetNotFoundException(nameof(Target));
+                throw ExceptionHelper.GetNotFoundException(nameof(robot.Target));
             }
             else if (targets.Count() > 1)
             {
-                throw GetSingleException(nameof(Target));
+                throw ExceptionHelper.GetNonSingleException(nameof(robot.Target));
             }
-            else
+            else if (targets.Single() != robot.Target)
             {
-                Target = targets.Single();
+                throw ExceptionHelper.GetInitializationException(nameof(robot.Target));
             }
 
-            Path = new List<AbstractTile>();
+            Robots = robots;
 
             Initialize();
         }
 
         public abstract void RunSearch();
-
-        private Exception GetInitializationException() => new InvalidOperationException("Failed to initialize");
-
-        private Exception GetNotFoundException(string element) => new InvalidOperationException($"No {element} element was found in grid");
-
-        private Exception GetSingleException(string element) => new InvalidOperationException($"Only one {element} element can be defined in grid for single robot algorithm");
     }
 }

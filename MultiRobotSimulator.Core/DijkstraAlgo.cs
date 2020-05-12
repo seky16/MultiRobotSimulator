@@ -31,7 +31,7 @@ namespace MultiRobotSimulator.Core
                 Q.Add(v);
             }
 
-            dist[Start] = 0;
+            dist[Robot.Start] = 0;
 
             AbstractTile? u = null;
             while (Q.Count > 0)
@@ -60,16 +60,16 @@ namespace MultiRobotSimulator.Core
 
             if (u is null) throw new InvalidOperationException();
 
-            if (prev[u] != null || u.IsStart)
+            if (prev[u] != null || u == Robot.Start)
             {
                 while (u != null)
                 {
-                    Path.Add(u);
+                    Robot.Path.Add(u);
                     u = prev[u];
                 }
             }
 
-            Path.Reverse();
+            Robot.Path.Reverse();
         }
     }
 }

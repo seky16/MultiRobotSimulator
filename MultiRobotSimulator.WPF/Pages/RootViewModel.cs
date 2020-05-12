@@ -6,14 +6,16 @@ using System.Windows;
 using Microsoft.Extensions.Logging;
 using MultiRobotSimulator.Core.Enums;
 using MultiRobotSimulator.Core.Factories;
+using MultiRobotSimulator.Core.Models;
 using MultiRobotSimulator.WPF.Events;
 using MultiRobotSimulator.WPF.Services;
 using Stylet;
 
 namespace MultiRobotSimulator.WPF.Pages
 {
-    public class RootViewModel : Conductor<EditorTabViewModel>.Collection.OneActive
+    public class RootViewModel : Conductor<EditorTabViewModel>.Collection.OneActive, IHandle<SearchDoneEvent>
     {
+        private readonly Dictionary<EditorTabViewModel, AlgoResult?> _algoResults = new Dictionary<EditorTabViewModel, AlgoResult?>();
         private readonly AlgoService _algoService;
 
         private readonly Func<EditorTabViewModel> _editorTabFactory;
@@ -25,6 +27,7 @@ namespace MultiRobotSimulator.WPF.Pages
         private readonly IWindowManager _windowManager;
         private DrawingMode _drawingMode;
         private bool _renderGraph;
+        private bool _renderPaths;
         private Guid _selectedAlgo;
         private int untitledIndex = 0;
 
@@ -49,6 +52,29 @@ namespace MultiRobotSimulator.WPF.Pages
 
             Algos = _algoService.DisplayNames;
             SelectedAlgo = Algos.Keys.FirstOrDefault();
+            _eventAggregator.Subscribe(this);
+        }
+
+        public AlgoResult? AlgoResult
+        {
+            get
+            {
+                if (_algoResults.TryGetValue(ActiveItem, out var result))
+                {
+                    _logger.LogDebug("AlgoResult get {result}", result);
+                    return result;
+                }
+                _logger.LogDebug("AlgoResult get {result}", null);
+                return null;
+            }
+            set
+            {
+                _logger.LogDebug("AlgoResult set {result}", value);
+                _algoResults[ActiveItem] = value;
+                NotifyOfPropertyChange(nameof(AlgoResult));
+                NotifyOfPropertyChange(nameof(HasAlgoResult));
+                _eventAggregator.Publish(new CanvasRedrawEvent());
+            }
         }
 
         public Dictionary<Guid, string> Algos { get; }
@@ -57,6 +83,16 @@ namespace MultiRobotSimulator.WPF.Pages
         {
             get { return _drawingMode; }
             set { SetAndNotify(ref _drawingMode, value); }
+        }
+
+        public bool HasAlgoResult
+        {
+            get
+            {
+                var foo = _algoResults.TryGetValue(ActiveItem, out var result) && result != null;
+                _logger.LogDebug("HasAlgoResult {result}", foo);
+                return foo;
+            }
         }
 
         public bool HasOpenTabs => Items.Count > 0;
@@ -71,10 +107,34 @@ namespace MultiRobotSimulator.WPF.Pages
             }
         }
 
+        public bool RenderPaths
+        {
+            get { return _renderPaths; }
+            set
+            {
+                SetAndNotify(ref _renderPaths, value);
+                _eventAggregator.Publish(new CanvasRedrawEvent());
+            }
+        }
+
         public Guid SelectedAlgo
         {
             get { return _selectedAlgo; }
             set { SetAndNotify(ref _selectedAlgo, value); }
+        }
+
+        public override void ActivateItem(EditorTabViewModel item)
+        {
+            if (ActiveItem != item)
+            {
+                _logger.LogInformation("Activating item '{displayName}'", item.DisplayName);
+            }
+
+            base.ActivateItem(item);
+
+            NotifyOfPropertyChange(nameof(AlgoResult));
+            NotifyOfPropertyChange(nameof(HasAlgoResult));
+            _eventAggregator.Publish(new CanvasRedrawEvent());
         }
 
         public void EditorClearAll()
@@ -82,6 +142,7 @@ namespace MultiRobotSimulator.WPF.Pages
             _logger.LogInformation("Clearing map '{displayName}'", ActiveItem.DisplayName);
 
             ActiveItem.HasChanges |= ActiveItem.Map.ClearAll();
+            AlgoResult = null;
             _eventAggregator.Publish(new CanvasRedrawEvent());
         }
 
@@ -105,7 +166,7 @@ namespace MultiRobotSimulator.WPF.Pages
 
             if (Items.Count == 1)
             {
-                NotifyOfPropertyChange(() => HasOpenTabs);
+                NotifyOfPropertyChange(nameof(HasOpenTabs));
             }
         }
 
@@ -138,7 +199,7 @@ namespace MultiRobotSimulator.WPF.Pages
 
                 if (Items.Count == 1)
                 {
-                    NotifyOfPropertyChange(() => HasOpenTabs);
+                    NotifyOfPropertyChange(nameof(HasOpenTabs));
                 }
             }
 
@@ -153,6 +214,11 @@ namespace MultiRobotSimulator.WPF.Pages
         public void FileSaveAs()
         {
             Save(ActiveItem, null);
+        }
+
+        public void Handle(SearchDoneEvent message)
+        {
+            AlgoResult = message.Result;
         }
 
         public void RunSearch()
@@ -195,8 +261,20 @@ namespace MultiRobotSimulator.WPF.Pages
 
             if (Items.Count == 0)
             {
-                NotifyOfPropertyChange(() => HasOpenTabs);
+                NotifyOfPropertyChange(nameof(HasOpenTabs));
             }
+        }
+
+        protected override bool SetAndNotify<T>(ref T field, T value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+        {
+            var result = base.SetAndNotify(ref field, value, propertyName);
+
+            if (result)
+            {
+                _logger?.LogTrace("Property '{propertyName}' new value: '{value}'", propertyName, value);
+            }
+
+            return result;
         }
 
         private bool Save(EditorTabViewModel tab, string? fullPath)
@@ -221,31 +299,5 @@ namespace MultiRobotSimulator.WPF.Pages
 
             return true;
         }
-
-        #region Logging overrides
-
-        public override void ActivateItem(EditorTabViewModel item)
-        {
-            if (ActiveItem != item)
-            {
-                _logger.LogInformation("Activating item '{displayName}'", item.DisplayName);
-            }
-
-            base.ActivateItem(item);
-        }
-
-        protected override bool SetAndNotify<T>(ref T field, T value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
-        {
-            var result = base.SetAndNotify(ref field, value, propertyName);
-
-            if (result)
-            {
-                _logger?.LogTrace("Property '{propertyName}' new value: '{value}'", propertyName, value);
-            }
-
-            return result;
-        }
-
-        #endregion Logging overrides
     }
 }

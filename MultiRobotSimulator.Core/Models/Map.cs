@@ -21,9 +21,6 @@ namespace MultiRobotSimulator.Core.Models
 
         private readonly Dictionary<(int x, int y), AbstractTile> _tileCache = new Dictionary<(int x, int y), AbstractTile>();
 
-        public List<Tile> Starts { get; } = new List<Tile>();
-        public List<Tile> Targets { get; } = new List<Tile>();
-
         public Map(int width, int height)
         {
             Width = width;
@@ -60,7 +57,8 @@ namespace MultiRobotSimulator.Core.Models
         }
 
         public int Height { get; }
-
+        public List<Tile> Starts { get; } = new List<Tile>();
+        public List<Tile> Targets { get; } = new List<Tile>();
         public int Width { get; }
 
         public bool AddToTile(Tile tile, DrawingMode drawingMode)
@@ -97,6 +95,9 @@ namespace MultiRobotSimulator.Core.Models
         public bool ClearAll()
         {
             var result = false;
+
+            Starts.Clear();
+            Targets.Clear();
 
             foreach (var tile in _wrappedGraph.Vertices)
             {

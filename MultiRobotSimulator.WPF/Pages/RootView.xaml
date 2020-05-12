@@ -79,13 +79,23 @@
                         </Border>
                     </TabItem>
                     <TabItem Header="Algorithms">
-                        <WrapPanel Orientation="Vertical">
+                        <WrapPanel Orientation="Vertical"  IsEnabled="{Binding HasOpenTabs}">
                             <TextBlock>* C#</TextBlock>
                             <TextBlock>* Python ?</TextBlock>
                             <TextBlock>* Lua ?</TextBlock>
                             <TextBlock>* JS ?</TextBlock>
                             <ComboBox ItemsSource="{Binding Algos}" DisplayMemberPath="Value" SelectedValuePath="Key" SelectedValue="{Binding SelectedAlgo, Mode=TwoWay}"></ComboBox>
                             <Button Click="{s:Action RunSearch}">Run search</Button>
+                            <GroupBox Header="Results" Visibility="{Binding HasAlgoResult, Converter={x:Static s:BoolToVisibilityConverter.Instance}}" IsEnabled="{Binding HasAlgoResult}">
+                                <StackPanel>
+                                    <CheckBox IsChecked="{Binding RenderPaths}">Render paths</CheckBox>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Margin="2">Search time:</TextBlock>
+                                        <TextBlock Margin="2" DataContext="{Binding AlgoResult}" Text="{Binding Path=ElapsedMilliseconds}" />
+                                        <TextBlock Margin="2">ms</TextBlock>
+                                    </StackPanel>
+                                </StackPanel>
+                            </GroupBox>
                         </WrapPanel>
                     </TabItem>
                 </TabControl>
