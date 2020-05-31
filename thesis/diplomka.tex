@@ -1,0 +1,204 @@
+\documentclass[a4paper,twoside,12pt]{report}% dvoustranný tisk
+%\documentclass[12pt]{report}% jednostranný tisk
+% všechny soubory jsou v utf-8
+	\usepackage{ucs}% pro kódování UTF-8
+	%\PrerenderUnicode{ěščřžýáíéĚŠČŘŽÝÁÍÉďťňĎŤŇůúÚóÓ} % předkreslení diakritiky, možno přidat/ubrat znaky podle potřeby
+							                  
+
+\usepackage[czech]{babel}% čeština
+%\usepackage[slovak]{babel}% slovenština
+\usepackage[IL2]{fontenc}% csr fonty (pokud jsou nainstalovány česká postscriptová mísma)
+%\usepackage[T1]{fontenc}% EC fonty - háčky a čárky jsou k písmenkům připojovány - nehezké
+
+
+\usepackage[]{diplomka}
+\usepackage[]{VSKP} % Sablona dle smernice rektora
+\input{VSKP} % Uvodni desky atd dle smernice rektora
+\splithyphens % při rozdělování slov se spojovníkem opakuj spojovník
+\usepackage[pdfencoding=unicode,
+			pdftitle={Plánování cesty pro více robotů},
+            pdfauthor={Bc. Ondřej Sekáč},
+            bookmarks=true,
+            linkcolor=blue,
+            colorlinks=true,
+            breaklinks=true]{hyperref}
+%\usepackage[pdftex]{graphicx}
+% Pro vytvoření titulního listu je potreba další balíček
+\usepackage{fontspec}  % Pro vkládání OTF fontů (vyžaduje titulní list) - nefunguje v pdfLaTeXu
+% Pro vložení titulního listu staženého ze Studisu stačí jen vkládáni PDF
+\usepackage{pdfpages} % Pro vkladání PDF souborů (s titulním listem apod.)
+\DeclareGraphicsExtensions{.png,.pdf}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{mathtools}
+
+% https://en.wikibooks.org/wiki/LaTeX/Mathematics#Inserting_%22Displayed%22_maths_inside_blocks_of_text
+%\everymath{\displaystyle} 
+
+\usepackage{amsthm}
+
+% sazime.pdf str. 11
+\newtheorem{veta}{Věta}
+\newtheorem{lemma}[veta]{Lemma}
+\theoremstyle{definition}
+\newtheorem{definice}{Definice}
+\theoremstyle{remark}
+\newtheorem*{poznamka}{Poznámka}
+\newtheorem*{priklad}{Příklad}
+\renewcommand{\proofname}{Důkaz}
+
+% sazime.pdf str. 15
+\usepackage{amsfonts}
+
+%\usepackage[czech,boxed,linesnumbered]{algorithm2e}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\floatname{algorithm}{Algoritmus}
+% https://tex.stackexchange.com/a/119274
+\usepackage{multicol}
+% https://tex.stackexchange.com/a/33995
+\usepackage{varwidth}
+
+\usepackage{enumitem}
+
+%%% http://tex.stackexchange.com/a/60253
+\makeatletter
+\let\save@mathaccent\mathaccent
+\newcommand*\if@single[3]{%
+	\setbox0\hbox{${\mathaccent"0362{#1}}^H$}%
+	\setbox2\hbox{${\mathaccent"0362{\kern0pt#1}}^H$}%
+	\ifdim\ht0=\ht2 #3\else #2\fi
+}
+%The bar will be moved to the right by a half of \macc@kerna, which is computed by amsmath:
+\newcommand*\rel@kern[1]{\kern#1\dimexpr\macc@kerna}
+%If there's a superscript following the bar, then no negative kern may follow the bar;
+%an additional {} makes sure that the superscript is high enough in this case:
+\newcommand*\widebar[1]{\@ifnextchar^{{\wide@bar{#1}{0}}}{\wide@bar{#1}{1}}}
+%Use a separate algorithm for single symbols:
+\newcommand*\wide@bar[2]{\if@single{#1}{\wide@bar@{#1}{#2}{1}}{\wide@bar@{#1}{#2}{2}}}
+\newcommand*\wide@bar@[3]{%
+	\begingroup
+	\def\mathaccent##1##2{%
+		%Enable nesting of accents:
+		\let\mathaccent\save@mathaccent
+		%If there's more than a single symbol, use the first character instead (see below):
+		\if#32 \let\macc@nucleus\first@char \fi
+		%Determine the italic correction:
+		\setbox\z@\hbox{$\macc@style{\macc@nucleus}_{}$}%
+		\setbox\tw@\hbox{$\macc@style{\macc@nucleus}{}_{}$}%
+		\dimen@\wd\tw@
+		\advance\dimen@-\wd\z@
+		%Now \dimen@ is the italic correction of the symbol.
+		\divide\dimen@ 3
+		\@tempdima\wd\tw@
+		\advance\@tempdima-\scriptspace
+		%Now \@tempdima is the width of the symbol.
+		\divide\@tempdima 10
+		\advance\dimen@-\@tempdima
+		%Now \dimen@ = (italic correction / 3) - (Breite / 10)
+		\ifdim\dimen@>\z@ \dimen@0pt\fi
+		%The bar will be shortened in the case \dimen@<0 !
+		\rel@kern{0.6}\kern-\dimen@
+		\if#31
+		\overline{\rel@kern{-0.6}\kern\dimen@\macc@nucleus\rel@kern{0.4}\kern\dimen@}%
+		\advance\dimen@0.4\dimexpr\macc@kerna
+		%Place the combined final kern (-\dimen@) if it is >0 or if a superscript follows:
+		\let\final@kern#2%
+		\ifdim\dimen@<\z@ \let\final@kern1\fi
+		\if\final@kern1 \kern-\dimen@\fi
+		\else
+		\overline{\rel@kern{-0.6}\kern\dimen@#1}%
+		\fi
+	}%
+	\macc@depth\@ne
+	\let\math@bgroup\@empty \let\math@egroup\macc@set@skewchar
+	\mathsurround\z@ \frozen@everymath{\mathgroup\macc@group\relax}%
+	\macc@set@skewchar\relax
+	\let\mathaccentV\macc@nested@a
+	%The following initialises \macc@kerna and calls \mathaccent:
+	\if#31
+	\macc@nested@a\relax111{#1}%
+	\else
+	%If the argument consists of more than one symbol, and if the first token is
+	%a letter, use that letter for the computations:
+	\def\gobble@till@marker##1\endmarker{}%
+	\futurelet\first@char\gobble@till@marker#1\endmarker
+	\ifcat\noexpand\first@char A\else
+	\def\first@char{}%
+	\fi
+	\macc@nested@a\relax111{\first@char}%
+	\fi
+	\endgroup
+}
+\makeatother
+%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{csquotes}
+%\DeclareQuoteAlias{german}{czech}
+\MakeOuterQuote{"}
+
+%\usepackage{encxvlna}
+
+\begin{document}
+
+%% Vložení titulního listu staženého ze Studisu, soubor vložte do složky pdf
+%\includepdf[pages=1,offset=15.4mm -1in]
+%  {pdf/titulnilist.pdf}% název souboru nesmí obsahovat mezery!
+% Alternativně vysázet titulní list LuaLaTeXem
+%\titul% vytiskne titul práce
+%\abstrakty% vytiskne stránku s abstrakty
+%
+%
+%\prohlaseni{Prohlašuji, že}% prohlášení,
+%\podekovani{Děkuji }% poděkování, nepovinné
+%
+%% vlastní práce
+%\obsah% vytiskne obsah
+
+\setboolean{@twoside}{false}
+\includepdf[offset=75 -75]{pdf/TitulniListColor.pdf}%titulni list
+
+\newpage %prazdna strana
+\thispagestyle{empty} %prazdna strana
+\mbox{} %prazdna strana
+
+\includepdf[pages={1,2},offset=75 -75]{pdf/Zadani.pdf}%zadani BP
+
+\abstrakty% vytiskne stránku s abstrakty
+
+\newpage %prazdna strana
+\thispagestyle{empty} %prazdna strana
+\mbox{} %prazdna strana
+
+\prohlaseni{Prohlašuji, že jsem diplomovou práci "Plánování~cesty~pro~více~robotů" vypracoval samostatně pod vedením vedoucího práce RNDr.~Jiřího~Dvořáka,~CSc. s~použitím materiálů uvedených v seznamu literatury.}% prohlášení,
+
+\newpage %prazdna strana
+\thispagestyle{empty} %prazdna strana
+\mbox{} %prazdna strana
+
+\podekovani{Rád bych poděkoval vedoucímu této práce RNDr.~Jiřímu~Dvořákovi,~CSc. za odborné vedení, trpělivost a cenné rady. Dále děkuji rodině za podporu při studiu.}% poděkování, nepovinné
+
+\newpage %prazdna strana
+\thispagestyle{empty} %prazdna strana
+\mbox{} %prazdna strana
+
+%\obsah
+\setboolean{@twoside}{true}
+\tableofcontents
+%
+%  vlastni text
+%
+\input{Uvod}% nutné
+%
+% sem vlastni opsany text, možno vložit více souborů (nejlépe pro každou kapitolu zvláštní soubor)
+\input{text}
+
+%
+\input{Zaver}% nutné
+\input{Literatura}% nutné
+\input{SeznamZkratek}% nutné
+\input{SeznamPriloh}% není povinné
+\end{document}
