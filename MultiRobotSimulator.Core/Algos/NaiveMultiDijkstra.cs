@@ -1,15 +1,16 @@
-﻿using System;
+﻿#nullable disable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MultiRobotSimulator.Abstractions;
 
-namespace MultiRobotSimulator.Core
+namespace MultiRobotSimulator.Core.Algos
 {
     public class NaiveMultiDijkstra : AbstractMultiRobotAlgo
     {
         private List<Dictionary<AbstractTile, double>> dist;
-        private List<Dictionary<AbstractTile, AbstractTile?>> prev;
+        private List<Dictionary<AbstractTile, AbstractTile>> prev;
         private List<List<AbstractTile>> Q;
 
         public override string Name => nameof(NaiveMultiDijkstra);
@@ -17,12 +18,12 @@ namespace MultiRobotSimulator.Core
         public override void Initialize()
         {
             dist = new List<Dictionary<AbstractTile, double>>();
-            prev = new List<Dictionary<AbstractTile, AbstractTile?>>();
+            prev = new List<Dictionary<AbstractTile, AbstractTile>>();
             Q = new List<List<AbstractTile>>();
             for (var i = 0; i < Robots.Count; i++)
             {
                 dist.Add(new Dictionary<AbstractTile, double>());
-                prev.Add(new Dictionary<AbstractTile, AbstractTile?>());
+                prev.Add(new Dictionary<AbstractTile, AbstractTile>());
                 Q.Add(new List<AbstractTile>());
             }
         }
@@ -42,7 +43,7 @@ namespace MultiRobotSimulator.Core
 
                 dist[i][robot.Start] = 0;
 
-                AbstractTile? u = null;
+                AbstractTile u = null;
                 while (Q.Count > 0)
                 {
                     u = Q[i].OrderBy(t => dist[i][t]).First();

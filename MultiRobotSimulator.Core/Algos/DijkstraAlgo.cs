@@ -1,14 +1,15 @@
-﻿using System;
+﻿#nullable disable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MultiRobotSimulator.Abstractions;
 
-namespace MultiRobotSimulator.Core
+namespace MultiRobotSimulator.Core.Algos
 {
     public class DijkstraAlgo : AbstractSingleRobotAlgo
     {
         private Dictionary<AbstractTile, double> dist;
-        private Dictionary<AbstractTile, AbstractTile?> prev;
+        private Dictionary<AbstractTile, AbstractTile> prev;
         private List<AbstractTile> Q;
 
         public override string Name => "Dijkstra's algorithm";
@@ -16,7 +17,7 @@ namespace MultiRobotSimulator.Core
         public override void Initialize()
         {
             dist = new Dictionary<AbstractTile, double>();
-            prev = new Dictionary<AbstractTile, AbstractTile?>();
+            prev = new Dictionary<AbstractTile, AbstractTile>();
             Q = new List<AbstractTile>();
         }
 
@@ -33,7 +34,7 @@ namespace MultiRobotSimulator.Core
 
             dist[Robot.Start] = 0;
 
-            AbstractTile? u = null;
+            AbstractTile u = null;
             while (Q.Count > 0)
             {
                 u = Q.OrderBy(t => dist[t]).First();
