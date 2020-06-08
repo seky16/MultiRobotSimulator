@@ -11,7 +11,7 @@ namespace MultiRobotSimulator.Core.Models
             ElapsedMilliseconds = elapsedMilliseconds;
             Robots = dotnetAlgo.Robots;
             Paths = dotnetAlgo.Robots.Select(r => r.Path).ToList();
-            AverageSearchTime = (double)ElapsedMilliseconds / Robots.Count;
+            //AverageSearchTime = (double)ElapsedMilliseconds / Robots.Count;
 
             foreach (var robot in Robots)
             {
@@ -23,10 +23,10 @@ namespace MultiRobotSimulator.Core.Models
                 }
             }
 
-            ShortestPathLength = Paths.Min(p => p.Count);
+            ShortestPathLength = Paths.Min(p => p.Distinct().Count());
         }
 
-        public double AverageSearchTime { get; }
+        //public double AverageSearchTime { get; }
         public long ElapsedMilliseconds { get; }
         public IReadOnlyCollection<IReadOnlyCollection<AbstractTile>> Paths { get; }
         public IReadOnlyCollection<Robot> Robots { get; }
