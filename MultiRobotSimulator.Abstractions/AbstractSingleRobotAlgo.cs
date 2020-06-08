@@ -1,10 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using MultiRobotSimulator.Abstractions.Helpers;
 
 namespace MultiRobotSimulator.Abstractions
 {
-    public abstract class AbstractSingleRobotAlgo : IAlgo
+    public abstract class AbstractSingleRobotAlgo : AbstractSingleRobotAlgo<Robot>
+    { }
+
+    public abstract class AbstractSingleRobotAlgo<TRobot> : IAlgo<TRobot> where TRobot : Robot
     {
         private IGraph? _graph;
 
@@ -28,53 +32,38 @@ namespace MultiRobotSimulator.Abstractions
         public bool Initialized { get; private set; }
         public abstract string Name { get; }
 
-        public Robot Robot => Robots.First();
+        public TRobot Robot => Robots.First();
 
-        public IReadOnlyCollection<Robot> Robots { get; private set; } = new List<Robot>();
+        public IReadOnlyCollection<TRobot> Robots { get; private set; } = new List<TRobot>();
 
         public abstract void Initialize();
 
-        public void InitializeInternal(IGraph graph, IReadOnlyCollection<Robot> robots)
+        public void InitializeInternal(IGraph graph, IEnumerable<AbstractTile> starts, IEnumerable<AbstractTile> targets)
         {
-            Initialized = true;
             Graph = graph;
 
-            if (robots.Count != 1 || !(robots.ElementAt(0) is Robot robot))
-            {
-                throw ExceptionHelper.GetInitializationException(nameof(Robot));
-            }
-
-            var starts = graph.Vertices.Where(t => t.IsStart);
             if (!starts.Any())
             {
-                throw ExceptionHelper.GetNotFoundException(nameof(robot.Start));
+                throw ExceptionHelper.GetNotFoundException(nameof(Robot.Start));
             }
             else if (starts.Count() > 1)
             {
-                throw ExceptionHelper.GetNonSingleException(nameof(robot.Start));
-            }
-            else if (starts.Single() != robot.Start)
-            {
-                throw ExceptionHelper.GetInitializationException(nameof(robot.Start));
+                throw ExceptionHelper.GetNonSingleException(nameof(Robot.Start));
             }
 
-            var targets = graph.Vertices.Where(t => t.IsTarget);
             if (!targets.Any())
             {
-                throw ExceptionHelper.GetNotFoundException(nameof(robot.Target));
+                throw ExceptionHelper.GetNotFoundException(nameof(Robot.Target));
             }
             else if (targets.Count() > 1)
             {
-                throw ExceptionHelper.GetNonSingleException(nameof(robot.Target));
-            }
-            else if (targets.Single() != robot.Target)
-            {
-                throw ExceptionHelper.GetInitializationException(nameof(robot.Target));
+                throw ExceptionHelper.GetNonSingleException(nameof(Robot.Target));
             }
 
-            Robots = robots;
+            Robots = new List<TRobot>() { (TRobot)Activator.CreateInstance(typeof(TRobot), starts.Single(), targets.Single()) };
 
             Initialize();
+            Initialized = true;
         }
 
         public abstract void RunSearch();

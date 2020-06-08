@@ -5,7 +5,11 @@ using MultiRobotSimulator.Abstractions.Helpers;
 
 namespace MultiRobotSimulator.Abstractions
 {
-    public abstract class AbstractMultiRobotAlgo : IAlgo
+    public abstract class AbstractMultiRobotAlgo : AbstractMultiRobotAlgo<Robot>
+    {
+    }
+
+    public abstract class AbstractMultiRobotAlgo<TRobot> : IAlgo<TRobot> where TRobot : Robot
     {
         private IGraph? _graph;
 
@@ -25,14 +29,24 @@ namespace MultiRobotSimulator.Abstractions
         public bool Initialized { get; private set; }
         public abstract string Name { get; }
 
-        public IReadOnlyCollection<Robot> Robots { get; private set; } = new List<Robot>();
+        public IReadOnlyCollection<TRobot> Robots { get; private set; } = new List<TRobot>();
 
         public abstract void Initialize();
 
-        public void InitializeInternal(IGraph graph, IReadOnlyCollection<Robot> robots)
+        public void InitializeInternal(IGraph graph, IEnumerable<AbstractTile> starts, IEnumerable<AbstractTile> targets)
         {
-            Initialized = true;
+            if (starts.Count() != targets.Count())
+            {
+                throw new InvalidOperationException($"Count mismatch! Starts={starts.Count()}, Targets={targets.Count()}");
+            }
+
             Graph = graph;
+
+            var robots = new List<TRobot>();
+            for (var i = 0; i < starts.Count(); i++)
+            {
+                robots.Add((TRobot)Activator.CreateInstance(typeof(TRobot), starts.ElementAt(i), targets.ElementAt(i)));
+            }
 
             if (robots.Count == 0)
             {
@@ -41,30 +55,8 @@ namespace MultiRobotSimulator.Abstractions
 
             Robots = robots;
 
-            var graphStarts = graph.Vertices.Where(t => t.IsStart);
-            var graphTargets = graph.Vertices.Where(t => t.IsTarget);
-            var startsCount = graphStarts.Count();
-            var targetsCount = graphTargets.Count();
-            if (startsCount != targetsCount && startsCount != Robots.Count)
-            {
-                throw new InvalidOperationException($"Count mismatch! Robots={Robots.Count} Starts={startsCount}, Targets={targetsCount}");
-            }
-
-            var robotStarts = Robots.Select(r => r.Start);
-            var robotTargets = Robots.Select(r => r.Target);
-            for (var i = 0; i < Robots.Count; i++)
-            {
-                if (!robotStarts.Contains(graphStarts.ElementAt(i)))
-                {
-                    throw ExceptionHelper.GetInitializationException("Start");
-                }
-                if (!robotTargets.Contains(graphTargets.ElementAt(i)))
-                {
-                    throw ExceptionHelper.GetInitializationException("Target");
-                }
-            }
-
             Initialize();
+            Initialized = true;
         }
 
         public abstract void RunSearch();
