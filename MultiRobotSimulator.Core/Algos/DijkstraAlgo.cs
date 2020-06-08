@@ -16,14 +16,10 @@ namespace MultiRobotSimulator.Core.Algos
 
         public override void Initialize()
         {
-            dist = new Dictionary<AbstractTile, double>();
-            prev = new Dictionary<AbstractTile, AbstractTile>();
-            Q = new List<AbstractTile>();
-        }
-
-        public override void RunSearch()
-        {
-            if (Graph is null) throw new InvalidOperationException();
+            var tilesCount = Graph.Vertices.Count();
+            dist = new Dictionary<AbstractTile, double>(tilesCount);
+            prev = new Dictionary<AbstractTile, AbstractTile>(tilesCount);
+            Q = new List<AbstractTile>(tilesCount);
 
             foreach (var v in Graph.Vertices)
             {
@@ -33,7 +29,10 @@ namespace MultiRobotSimulator.Core.Algos
             }
 
             dist[Robot.Start] = 0;
+        }
 
+        public override void RunSearch()
+        {
             AbstractTile u = null;
             while (Q.Count > 0)
             {
