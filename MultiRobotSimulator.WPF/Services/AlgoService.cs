@@ -54,8 +54,13 @@ namespace MultiRobotSimulator.WPF.Services
             {
                 var sw = Stopwatch.StartNew();
 
-                dotnetAlgo.InitializeInternal(graph, graph.Starts.Cast<AbstractTile>(),graph.Targets.Cast<AbstractTile>());
+                var robots = new List<Robot>();
+                for (var i = 0; i < graph.Starts.Count; i++)
+                {
+                    robots.Add(new Robot(graph.Starts[i], graph.Targets[i]));
+                }
 
+                dotnetAlgo.InitializeInternal(graph, robots);
                 _logger.LogInformation("{action} took {ms} ms", "dotnet init", sw.ElapsedMilliseconds);
 
                 sw.Restart();
