@@ -13,10 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation
 - Benchmarks
 - Collision checks, result validation 
+- change QuickGraph to Algorithmia for `Graph`
 
 ## [Unreleased]
 ### Added
+- Local Repair A* implementation [Silver]
 ### Changed
+- Moved Algos to separate namespace
 ### Removed
 
 ## [0.4.0] (2020-05-12)
