@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 using System.Collections.Generic;
 using System.Linq;
@@ -89,7 +89,7 @@ namespace MultiRobotSimulator.Core.Algos
                 Position
             };
             _gScore[Position] = 0;
-            _fScore[Position] = Helpers.Metrics.Euclidean(Start, Target); // TODO add agitation noise (see Silver)
+            _fScore[Position] = Helpers.Metrics.Euclidean(Position, Target); // TODO add agitation noise (see Silver)
 
             AbstractTile current;
             while (_open.Count > 0)
@@ -123,8 +123,6 @@ namespace MultiRobotSimulator.Core.Algos
                     }
                 }
             }
-
-            return;
         }
 
         public AbstractTile Step()
