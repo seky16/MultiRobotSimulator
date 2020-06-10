@@ -1,6 +1,5 @@
 ﻿#nullable disable
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using MultiRobotSimulator.Abstractions;
@@ -25,22 +24,21 @@ namespace MultiRobotSimulator.Core.Algos
 
         public override void RunSearch()
         {
-            foreach (var robot in _LRAStarRobots)
+            System.Threading.Tasks.Parallel.ForEach(_LRAStarRobots, robot =>
             {
-                // run A* from start to target
-                robot.Search(Graph, Helpers.Metrics.Euclidean);
-            }
+                robot.Search(Graph);
+            });
 
-            var enRoute = _LRAStarRobots.Where(r => r.Position != r.Target);
+            var enRoute = _LRAStarRobots.Where(r => r.Position != null && r.Position != r.Target);
             while (enRoute.Any())
             {
                 foreach (var robot in enRoute)
                 {
                     var next = robot.Step(); // get the next position
-                    if (enRoute.Any(r => r != robot && r.Position == next))
+                    if (next != null && enRoute.Any(r => r != robot && r.Position == next))
                     {
                         // occupied - recalculate remainder of the route
-                        robot.Search(Graph, Helpers.Metrics.Euclidean, next);
+                        robot.Search(Graph, next);
                     }
                     else
                     {
@@ -48,13 +46,14 @@ namespace MultiRobotSimulator.Core.Algos
                     }
                 }
 
-                enRoute = _LRAStarRobots.Where(r => r.Position != r.Target);
+                enRoute = _LRAStarRobots.Where(r => r.Position != null && r.Position != r.Target);
             }
         }
     }
 
     public class LRAStarRobot
     {
+        private readonly Robot _robot;
         private Dictionary<AbstractTile, AbstractTile> _cameFrom;
 
         private Dictionary<AbstractTile, double> _fScore;
@@ -64,12 +63,6 @@ namespace MultiRobotSimulator.Core.Algos
         private BinaryHeapPriorityQueue<AbstractTile> _open;
 
         private int _posIndex = 0;
-        private readonly Robot _robot;
-
-        public List<AbstractTile> Path => _robot.Path;
-        public AbstractTile Start => _robot.Start;
-        public AbstractTile Target => _robot.Target;
-
 
         public LRAStarRobot(Robot robot)
         {
@@ -78,9 +71,12 @@ namespace MultiRobotSimulator.Core.Algos
             Position = Start;
         }
 
+        public List<AbstractTile> Path => _robot.Path;
         public AbstractTile Position { get; set; }
+        public AbstractTile Start => _robot.Start;
+        public AbstractTile Target => _robot.Target;
 
-        public void Search(IGraph graph, Func<AbstractTile, AbstractTile, double> h, AbstractTile restricted = null)
+        public void Search(IGraph graph, AbstractTile restricted = null)
         {
             Path.RemoveRange(_posIndex, Path.Count - _posIndex);
 
@@ -90,11 +86,10 @@ namespace MultiRobotSimulator.Core.Algos
             _gScore = new Dictionary<AbstractTile, double>(tilesCount);
             _open = new BinaryHeapPriorityQueue<AbstractTile>((a, b) => _fScore.GetValueOrDefault(b, double.PositiveInfinity).CompareTo(_fScore.GetValueOrDefault(a, double.PositiveInfinity)))
             {
-                Start
+                Position
             };
-
-            _gScore[Start] = 0;
-            _fScore[Start] = h(Start, Target); // TODO add agitation noise (see Silver)
+            _gScore[Position] = 0;
+            _fScore[Position] = Helpers.Metrics.Euclidean(Start, Target); // TODO add agitation noise (see Silver)
 
             AbstractTile current;
             while (_open.Count > 0)
@@ -114,12 +109,12 @@ namespace MultiRobotSimulator.Core.Algos
                         continue;
                     }
 
-                    var gScore = _gScore.GetValueOrDefault(current, double.PositiveInfinity) + h(current, neighbor); // TODO add agitation noise (see Silver)
+                    var gScore = _gScore.GetValueOrDefault(current, double.PositiveInfinity) + Helpers.Metrics.Euclidean(current, neighbor); // TODO add agitation noise (see Silver)
                     if (gScore < _gScore.GetValueOrDefault(neighbor, double.PositiveInfinity))
                     {
                         _cameFrom[neighbor] = current;
                         _gScore[neighbor] = gScore;
-                        _fScore[neighbor] = gScore + h(neighbor, Target);
+                        _fScore[neighbor] = gScore + Helpers.Metrics.Euclidean(neighbor, Target);
 
                         if (!_open.Contains(neighbor))
                         {
@@ -129,12 +124,17 @@ namespace MultiRobotSimulator.Core.Algos
                 }
             }
 
-            throw new InvalidOperationException($"Cannot find path from {Position} to {Target}");
+            return;
         }
 
         public AbstractTile Step()
         {
-            return Path[++_posIndex];
+            if (_posIndex < Path.Count)
+            {
+                return Path[++_posIndex];
+            }
+
+            return null;
         }
 
         private static List<AbstractTile> ReconstructPath(Dictionary<AbstractTile, AbstractTile> cameFrom, AbstractTile current)
