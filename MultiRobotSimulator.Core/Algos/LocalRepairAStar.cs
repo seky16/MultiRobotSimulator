@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +38,9 @@ namespace MultiRobotSimulator.Core.Algos
                     if (next != null && enRoute.Any(r => r != robot && r.Position == next))
                     {
                         // occupied - recalculate remainder of the route
-                        robot.Search(Graph, next);
+                        var graph = Graph.Clone();
+                        graph.RemoveVertex(next);
+                        robot.Search(graph);
                     }
                     else
                     {
@@ -76,7 +78,7 @@ namespace MultiRobotSimulator.Core.Algos
         public AbstractTile Start => _robot.Start;
         public AbstractTile Target => _robot.Target;
 
-        public void Search(IGraph graph, AbstractTile restricted = null)
+        public void Search(IGraph graph)
         {
             Path.RemoveRange(_posIndex, Path.Count - _posIndex);
 
@@ -104,11 +106,6 @@ namespace MultiRobotSimulator.Core.Algos
 
                 foreach (var neighbor in graph.AdjacentVertices(current))
                 {
-                    if (neighbor == restricted)
-                    {
-                        continue;
-                    }
-
                     var gScore = _gScore.GetValueOrDefault(current, double.PositiveInfinity) + Helpers.Metrics.Euclidean(current, neighbor); // TODO add agitation noise (see Silver)
                     if (gScore < _gScore.GetValueOrDefault(neighbor, double.PositiveInfinity))
                     {
