@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -60,7 +60,7 @@ namespace MultiRobotSimulator.WPF.Services
                     robots.Add(new Robot(graph.Starts[i], graph.Targets[i]));
                 }
 
-                dotnetAlgo.InitializeInternal(graph, robots);
+                dotnetAlgo.InitializeInternal(graph.Clone(), robots);
                 _logger.LogInformation("{action} took {ms} ms", "dotnet init", sw.ElapsedMilliseconds);
 
                 sw.Restart();

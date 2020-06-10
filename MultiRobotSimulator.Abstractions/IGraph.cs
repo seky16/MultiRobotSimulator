@@ -15,6 +15,8 @@ namespace MultiRobotSimulator.Abstractions
 
         IEnumerable<AbstractTile> AdjacentVertices(AbstractTile v);
 
+        IGraph Clone();
+
         bool ContainsEdge(AbstractTile source, AbstractTile target);
 
         bool ContainsEdge((AbstractTile, AbstractTile) edge);
@@ -26,6 +28,12 @@ namespace MultiRobotSimulator.Abstractions
         object GetWrappedGraph();
 
         bool IsAdjacentEdgesEmpty(AbstractTile v);
+
+        bool RemoveEdge((AbstractTile, AbstractTile) edge);
+
+        int RemoveEdges(IEnumerable<(AbstractTile, AbstractTile)> edges);
+
+        bool RemoveVertex(AbstractTile v);
 
         bool TryGetEdge(AbstractTile source, AbstractTile target, out (AbstractTile, AbstractTile) edge);
     }
