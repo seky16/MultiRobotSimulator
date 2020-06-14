@@ -64,8 +64,130 @@
 %\end{cases}
 %\end{equation}
 
-\chapter{Kapitola}
-\section{Podkapitola}
-\subsection{Podpodkapitola}
+\chapter{Plánování cesty}
+Nutnou podmínkou pro fungování autonomního robota je jeho navigace, která se skládá ze tří procesů:
+\begin{enumerate}
+	\item Lokalizace -- schopnost robota určit svoji polohu a orientaci v prostředí. Odpovídá na otázku "Kde se nacházím?"
+	\item Mapování -- uložení dat získaných ze senzorů robota při prozkoumávání prostředí do dané reprezentace. Dává odpověď na otázku "Jak vypadá okolní svět?".
+	\item Plánování cesty -- Proces nalezení posloupnosti akcí, které vedou k dosažení daného cíle. Jedná se o otázku "Jak se dostanu do cílové pozice?".
+\end{enumerate}
+Lokalizace a mapování jsou navzájem provázané -- při lokalizaci robota v prostředí je nutné znát jeho reprezentaci a pro správné mapování je nutné znát současnou polohu, ze které byly daná data získána. Plánování cesty je s těmito procesy úzce spjato, jelikož hledáme cestu v závislosti na současné poloze a reprezentaci prostředí. [Meyer, Cyrill, Introduction]
+
+\section{Formulace problému plánování cesty}
+\subsection{Stavový prostor}
+Každou jedinečnou situaci, do které se robot v prostředí může dostat, nazveme \emph{stav} $x$. Je důležité aby stav obsahoval právě ty informace, které potřebujeme k vyřešení problému. Množina stavů (označovaných $x$) se nazývá \emph{stavový prostor} $X$. Aplikací \emph{akce} $u$ na daný stav $x$ přejdeme do stavu $x'$, což je dáno tzv. \emph{přechodovou funkcí} $f$,
+\begin{equation}
+x'=f\left(x,u\right).
+\end{equation}
+Množinu $U(x)$, která reprezentuje všechny možné akce proveditelné ve stavu $x$ nazveme \emph{akčním prostorem}. Můžeme také definovat množinu všech možných akcí ve všech stavech jako
+\begin{equation}
+U=\bigcup_{x \in X} U(x).
+\end{equation}
+Dále definujeme množinu \emph{cílových stavů} $x_G \subset X$. Cílem obecného problému plánování je nalézt konečnou posloupnost akcí, která převede počáteční stav $x_0$ na některý z cílových stavů z $X_G$. 
+
+Tento problém je možné interpretovat jako \emph{stavový přechodový graf}, ve kterém vrcholy reprezentují stavový prostor $X$ a orientovaná hrana grafu ze stavu $x$ do stavu $x'$ reprezentuje akci $u$ splňující funkci $x'=f(x,u)$. [LaValle]
+
+\subsection{Pracovní prostor}
+Prostředí, ve kterém se robot pohybuje nazveme \emph{pracovní prostor} $W$. Jedná se o $N$-rozměrný Euklidovský prostor ($\mathbb{R}^2$ nebo $\mathbb{R}^3$). V pracovním prostoru se mohou vyskytovat různé překážky, ty značíme $O\subset W$. Překážky mohou být buď statické (nemění svoji polohu) nebo dynamické. [Introduction]
+
+
+\subsection{Konfigurační prostor}
+Plánování cesty přímo v pracovním prostoru je z hlediska časové náročnosti velice neefektivní, jelikož stavový prostor je široký. Přináší také veliké problémy při zohlednění stupňů volnosti, různých tvarů a dalších mechanických omezení robota, které jsou pro různé aplikace odlišné. Pro zobecnění se používá tzv. \emph{konfigurační prostor} $C$.
+
+V konfiguračním prostoru je robot reprezentován jako bod. \emph{Konfigurací} $q$ se myslí kompletní popis polohy a natočení robota v pracovním prostoru $W$. Konfigurační prostor $C$ je tedy množinou všech konfigurací $q$. Překážky $O$ vymezují \emph{kolizní konfigurační prostor} $C_obs$ tj. ty konfigurace, ve kterých by byl robot v kolizi s překážkou. Tzv. \emph{volný konfigurační prostor} je potom množinou všech přípustných konfigurací $C_{free}=C \setminus C_{obs}$. Nalezení \emph{přípustné cesty} je potom zobrazení
+\begin{equation}
+p: \left[0;L\right]\to C_{free},
+\end{equation}
+kde $L$ je délka cesty $p$. [Introduction,10.1.1.160.1972]
+
+\subsection{Plánování cesty}
+
+Problém plánování cesty lze tedy pomocí konfiguračního prostoru transformovat na problém hledání cesty ve stavovém přechodovém grafu. Uzly grafu jsou přípustné konfigurace $c\in C_{free}$. Každá hrana (tj. akce, přechod mezi danými konfiguracemi) má danou cenu. [hsplanguide]
+
+Je důležité brát v potaz účel daného robota, jelikož různé aplikace mohou mít různé požadavky. Ve většině případů se jedná o optimalizaci uražené vzdálenosti (tj. hledání nejkratší cesty). Dále je nutné dbát na účinnost, přesnost a bezpečnost robota i ostatních členů prostředí. Hledáme tedy ideálně cestu, při které se vyhneme kolizi s překážkami a dostaneme se do cíle v co nejkratším čase a za použití co nejméně energie. [Introduction]
+
+%Cílem plánování cesty je nalézt cestu z dané startovací pozice do cíle a při tom se vyhnout kolizi s překážkami. Zároveň je cílem optimalizovat nějakou kriteriální funkci, většinou uraženou vzdálenost, čas strávený cestou nebo co nejnižší energetický výdaj. [07342773;05585236;Liang15] 
+
+
+\section{Plánování cesty pro více robotů}
+Výše byl definovaný problém plánování cesty robota, ze kterého vycházíme při definici problému plánování cesty pro více robotů. Obecně se jedná o situaci, kdy máme $m$ robotů v $k$-rozměrném pracovním prostoru a každý robot má danou startovní a cílovou konfiguraci, tj. pozici a orientaci. Je požadováno nalezení cesty pro každého robota, při které se budou roboti vyhýbat překážkám i sobě navzájem. [ACooperativePath...]
+
+Případy využití několika robotů současně jsou stále častější. Jedná se jak o použití v přepravě, průmyslu, zemědělství, rybaření, těžbě např. dřeva, hledání ztracených osob, prohledávání neznámých planet nebo likvidace toxického odpadu, tak o vojenské využití -- řízení bezpilotních letounů, pokládání nebo zneškodnění min, atd. [dudek1996]
+
+Využití několika robotů může mít oproti použití pouze jednoho robota několik potenciálních výhod:
+\begin{itemize}
+	\item Prostorové rozložení -- vykonání úkonů v rozlehlých pracovních prostorech, které přesahují možnosti jednoho robota. Např. odpálení rakety otočením dvou klíčů současně.
+	\item Celkový výkon systému -- systém několika robotů může lépe optimalizovat cenovou funkci jako např. čas potřebný k vykonání úkolu nebo celková energie spotřebovaná roboty.
+	\item Sdílení informací -- např. více robotů je lépe schopno se lokalizovat navzájem, pokud si vyměňují informace.
+	\item Cena -- použití několika jednoduchých (levnějších) robotů, kteří jsou lehčí naprogramovat, může být levnější než použití jednoho komplexního (drahého) robota.
+	\item Spolehlivost, flexibilita -- při selhání jednoho robota jej může nahradit další.
+\end{itemize}
+[57313;dudek1996]
+
+
+Plánování cesty pro více robotů lze rozdělit do několika skupin podle různých kriterií:
+\begin{enumerate}
+	\item Podle úplnosti
+	\begin{enumerate}
+		\item \emph{Úplné} -- vždy naleznou cestu (pokud existuje) nebo ověří, že neexistuje. Časová náročnost těchto algoritmů však roste exponenciálně s počtem robotů.
+		\item \emph{Heuristické} -- nemusí nalézt žádnou cestu, i když existuje.
+	\end{enumerate}
+	\item Podle typů jednotlivých robotů
+	\begin{enumerate}
+		\item \emph{Homogenní} -- schopnosti robotů jsou identické.
+		\item \emph{Heterogenní} -- schopnosti robotů jsou různé. Každý robot má vlastní specializaci pro daný úkol. Obecně se jedná o náročnější plánování.
+	\end{enumerate}
+	\item Podle vzájemného chování robotů
+	\begin{enumerate}
+		\item \emph{Kooperativní} -- každý robot zná plány všech ostatních robotů. Roboti pracují společně na společném cíli. Speciálním případem je skupina mobilních robotů, která musí zachovávat předem určenou formaci, např. sekání fotbalového hřiště nebo přenášení nějakého předmětu více roboty.
+		\item \emph{Nekooperativní} -- roboti neznají plány ostatních robotů a musí tak předvídat jejich pohyby.
+		\item \emph{Antagonistické} -- každý robot se snaží dosáhnou svého cíle a případně zamezit ostatním robotům v dosažení jejich cílů.
+	\end{enumerate}
+	\item Podle povahy prostředí
+	\begin{enumerate}
+		\item \emph{Statické} -- obsahuje pouze překážky, které nemění svoji polohu.
+		\item \emph{Dynamické} -- obsahuje pohybující se překážky (např. lidé).
+	\end{enumerate}
+	\item Podle znalosti prostředí
+	\begin{enumerate}
+		\item \emph{Globální plánování cesty} -- roboti mají úplnou znalost pracovního prostoru před plánováním cesty.
+		\item \emph{Lokální plánování cesty} -- roboti mají neúplnou nebo žádnou znalost okolního prostředí. Musejí tedy v reálném čase snímat pomocí senzorů polohu překážek, vytvářet mapu prostředí a hledat v ní cestu.
+	\end{enumerate}
+	\item Podle ??
+	\begin{enumerate}
+		\item \emph{Offline} -- nejdříve je provedeno plánování cesty pro všechny roboty, poté se roboti podle těchto plánů začnou pohybovat.
+		\item \emph{Online}, příp. \emph{real-time} -- plánování cesty je spojeno s pohybem robotů. Nalezená cesta nemusí být optimální nebo vůbec nalezena, roboti ale netráví dlouhý čas plánováním a dokáží rychle reagovat i na změny prostředí.
+	\end{enumerate}
+	\item Podle přístupu k řešení problému
+	\begin{enumerate}
+		\item \emph{Centralizované} -- bere v úvahu všechny roboty zároveň jako jeden propojený systém. Snaží se o optimalitu a úplnost, proto v praxi trpí velikou časovou náročností.
+		\item \emph{Distribuované} -- rozdělí plánování na menší nezávislé nebo slabě závislé problémy, které řeší každý robot zvlášť. Schopné rychle nalézt dobré řešení, avšak ztrácí na úplnosti.
+	\end{enumerate}
+\end{enumerate}
+[06729271;Silver05;1305.2889;Introduction;ACooperativePath...;Asma17]
+
+\section{Zpracování prostředí}
+%Pro zobecnění problému plánování cesty robota do prohledávání v konfiguračním prostoru $C$ je nutná vhodná reprezentace prostředí, ve kterém se robot pohybuje.
+\subsection{Rozklad do buněk (Cell decomposition)}
+\subsection{Mapy cest (Roadmaps)}
+Visibility graph, Voronoi diagram
+\subsection{Potenciálová pole (Potential fields)}
+
+\chapter{Metody}
+\section{Klasické metody}
+Dijkstra, A*
+\section{Heuristické metody}
+Probabilistic Roadmaps, Rapidly-exploring Random Trees, Neural Networks, Genetic Algs, Simulated Annealing, ACO, PSO, Fuzzy
+
+\chapter{Implementace vybraných algoritmů}
+\section{Aplikace}
+\subsection{GUI}
+\subsection{Plug-in systém}
+\subsection{MovingAI benchmarks}
+
+\section{Local Repair A*}
+\section{Cooperative A*}
+
+\chapter{Vyhodnocení výsledků}
 
 \clearpage
