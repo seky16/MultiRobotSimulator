@@ -4,30 +4,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## TODO
-- Algorithms as plugins
-    - [Python?](https://stackoverflow.com/a/53612533)
-    - [Lua?](https://www.moonsharp.org/)
-    - [JavaScript?](https://github.com/Microsoft/ClearScript)
-- Tests
-- Documentation
-- Benchmarks
-- Collision checks, result validation 
-- change QuickGraph to Algorithmia for `Graph`
-
 ## [Unreleased]
 ### Added
-- Local Repair A* implementation [Silver]
+### Changed
+### Removed
+
+## [0.5.0] (2020-06-14)
+### Added
+- Local Repair A* implementation [[Silver](https://www.davidsilver.uk/wp-content/uploads/2020/01/coop-path-AIIDE.pdf)]
+- Cooperative A* implementation [[Silver](https://www.davidsilver.uk/wp-content/uploads/2020/01/coop-path-AIIDE.pdf)]
+- [Algorithmia](https://github.com/SolutionsDesign/Algorithmia) dependency (used in LRA*)
 ### Changed
 - Moved Algos to separate namespace
-### Removed
 
 ## [0.4.0] (2020-05-12)
 ### Added
-- Added `AbstractMultiRobotAlgo`
-- Added naive Dijkstra implementation for multiple robots
-- Added `Robot`
-- Added `SearchDoneEvent`
+- `AbstractMultiRobotAlgo`
+- Naive Dijkstra implementation for multiple robots
+- `Robot`
+- `SearchDoneEvent`
 
 ### Changed
 - Fixed rendering called for each tab
@@ -37,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Caching of tiles in `Map`
 - Added `Helpers.Metrics` to API
 - dotnet plugin support (see [plugins readme](MultiRobotSimulator.WPF/plugins/README.md))
-- Added rendering of found path (WIP)
+- Rendering of found path (WIP)
 
 ### Changed
 - Merged `Map` and `Graph`
@@ -65,7 +60,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Drawing obstacles/starts/finishes
 
 
-[Unreleased]: https://github.com/seky16/MultiRobotSimulator/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/seky16/MultiRobotSimulator/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/seky16/MultiRobotSimulator/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/seky16/MultiRobotSimulator/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/seky16/MultiRobotSimulator/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/seky16/MultiRobotSimulator/compare/v0.1.0...v0.2.0
