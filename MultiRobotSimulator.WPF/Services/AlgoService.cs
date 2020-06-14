@@ -61,14 +61,15 @@ namespace MultiRobotSimulator.WPF.Services
                 }
 
                 dotnetAlgo.InitializeInternal(graph.Clone(), robots);
-                _logger.LogInformation("{action} took {ms} ms", "dotnet init", sw.ElapsedMilliseconds);
+                var initTime = sw.ElapsedMilliseconds;
+                _logger.LogInformation("{action} took {ms} ms", "dotnet init", initTime);
 
                 sw.Restart();
                 dotnetAlgo.RunSearch();
                 sw.Stop();
                 _logger.LogInformation("{action} took {ms} ms", "dotnet search", sw.ElapsedMilliseconds);
 
-                var result = new AlgoResult(dotnetAlgo, sw.ElapsedMilliseconds);
+                var result = new AlgoResult(dotnetAlgo, initTime, sw.ElapsedMilliseconds);
 
                 _eventAggregator.Publish(new SearchDoneEvent(result));
             }

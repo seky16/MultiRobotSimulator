@@ -96,8 +96,13 @@
                                         <TextBlock Margin="2" DataContext="{Binding AlgoResult}" Text="{Binding Path=Paths.Count}" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
+                                        <TextBlock Margin="2">Init time:</TextBlock>
+                                        <TextBlock Margin="2" DataContext="{Binding AlgoResult}" Text="{Binding Path=InitTime, StringFormat=N2}" />
+                                        <TextBlock Margin="2">ms</TextBlock>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
                                         <TextBlock Margin="2">Search time:</TextBlock>
-                                        <TextBlock Margin="2" DataContext="{Binding AlgoResult}" Text="{Binding Path=ElapsedMilliseconds, StringFormat=N2}" />
+                                        <TextBlock Margin="2" DataContext="{Binding AlgoResult}" Text="{Binding Path=SearchTime, StringFormat=N2}" />
                                         <TextBlock Margin="2">ms</TextBlock>
                                     </StackPanel>
                                     <!--<StackPanel Orientation="Horizontal">
