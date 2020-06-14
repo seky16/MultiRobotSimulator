@@ -1,9 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MultiRobotSimulator.Abstractions
 {
     public abstract class AbstractTile : IComparable, IComparable<AbstractTile>, IEquatable<AbstractTile>
     {
+        /// <summary>
+        /// Optional attributes of the tile (e.g. fScore, gScore). Beware that values are generic objects, so you have to do boxing and unboxing yourself (which may hurt performance.
+        /// </summary>
+        public Dictionary<string, object> Attributes => new Dictionary<string, object>();
+
         public bool IsStart { get; set; }
         public bool IsTarget { get; set; }
         public bool Passable { get; set; }
