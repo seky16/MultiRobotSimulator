@@ -6,7 +6,7 @@ namespace MultiRobotSimulator.Core.Models
 {
     public class AlgoResult
     {
-        public AlgoResult(IAlgo dotnetAlgo,long initTime, long searchTime)
+        public AlgoResult(IAlgo dotnetAlgo, long initTime, long searchTime)
         {
             InitTime = initTime;
             SearchTime = searchTime;
@@ -27,11 +27,11 @@ namespace MultiRobotSimulator.Core.Models
             ShortestPathLength = Paths.Min(p => p.Distinct().Count());
         }
 
-        public long SearchTime { get; }
+        public long InitTime { get; }
         public IReadOnlyCollection<IReadOnlyCollection<AbstractTile>> Paths { get; }
         public IReadOnlyCollection<Robot> Robots { get; }
+        public long SearchTime { get; }
         public int ShortestPathLength { get; }
         public int Succesful { get; }
-        public long InitTime { get; }
     }
 }
