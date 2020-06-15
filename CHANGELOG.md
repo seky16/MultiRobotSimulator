@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 ### Removed
 
+## [0.6.0] (2020-06-15)
+### Added
+- Hierarchical Cooperative A* implementation [[Silver](https://www.davidsilver.uk/wp-content/uploads/2020/01/coop-path-AIIDE.pdf)]
+### Changed
+- Replaced Algorithmia with [OptimizedPriorityQueue](https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp)
+
 ## [0.5.0] (2020-06-14)
 ### Added
 - Local Repair A* implementation [[Silver](https://www.davidsilver.uk/wp-content/uploads/2020/01/coop-path-AIIDE.pdf)]
@@ -60,7 +66,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Drawing obstacles/starts/finishes
 
 
-[Unreleased]: https://github.com/seky16/MultiRobotSimulator/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/seky16/MultiRobotSimulator/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/seky16/MultiRobotSimulator/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/seky16/MultiRobotSimulator/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/seky16/MultiRobotSimulator/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/seky16/MultiRobotSimulator/compare/v0.2.0...v0.3.0

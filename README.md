@@ -19,9 +19,9 @@ Code for diploma thesis *Path planning for multiple robots*.
   - [ ] [Lua](https://www.moonsharp.org/)
   - [ ] [JavaScript](https://github.com/Microsoft/ClearScript)
 - Path-planning algorithms
-  - [x] [Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) - just a naive implementation
-  - [ ] [A*](https://en.wikipedia.org/wiki/A*_search_algorithm)
+  - [x] [Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) - just a naive implementation (fore testing purposes)
+  - [A*](https://en.wikipedia.org/wiki/A*_search_algorithm)
     - [x] Local Repair A* [[Silver](https://www.davidsilver.uk/wp-content/uploads/2020/01/coop-path-AIIDE.pdf)]
     - [x] Cooperative A* [[Silver](https://www.davidsilver.uk/wp-content/uploads/2020/01/coop-path-AIIDE.pdf)]
-    - [ ] Hierarchical Cooperative A* [[Silver](https://www.davidsilver.uk/wp-content/uploads/2020/01/coop-path-AIIDE.pdf)]
+    - [x] Hierarchical Cooperative A* [[Silver](https://www.davidsilver.uk/wp-content/uploads/2020/01/coop-path-AIIDE.pdf)]
   - [ ] [PSO](https://en.wikipedia.org/wiki/Particle_swarm_optimization) variants
