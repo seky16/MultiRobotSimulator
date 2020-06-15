@@ -1,8 +1,9 @@
-#nullable disable
+﻿#nullable disable
 
+using System;
 using System.Collections.Generic;
 using MultiRobotSimulator.Abstractions;
-using SD.Tools.Algorithmia.PriorityQueues;
+using MultiRobotSimulator.Helpers;
 
 namespace MultiRobotSimulator.Core.Algos
 {
@@ -10,9 +11,8 @@ namespace MultiRobotSimulator.Core.Algos
     {
         private readonly Dictionary<AbstractTile, AbstractTile> _cameFrom = new Dictionary<AbstractTile, AbstractTile>();
         private readonly HashSet<AbstractTile> _closed = new HashSet<AbstractTile>();
-        private readonly Dictionary<AbstractTile, double> _fScore = new Dictionary<AbstractTile, double>();
         private readonly Dictionary<AbstractTile, double> _gScore = new Dictionary<AbstractTile, double>();
-        private readonly BinaryHeapPriorityQueue<AbstractTile> _open;
+        private readonly Priority_Queue.SimplePriorityQueue<AbstractTile, double> _open = new Priority_Queue.SimplePriorityQueue<AbstractTile, double>();
         private readonly Robot _robot;
         private readonly Dictionary<AbstractTile, int> _time = new Dictionary<AbstractTile, int>();
         private readonly Dictionary<AbstractTile, int> _wait = new Dictionary<AbstractTile, int>();
@@ -20,23 +20,21 @@ namespace MultiRobotSimulator.Core.Algos
         public CoopAStarRobot(Robot robot)
         {
             _robot = robot;
-            _open = new BinaryHeapPriorityQueue<AbstractTile>((a, b) => _fScore.GetValueOrDefault(b, double.PositiveInfinity).CompareTo(_fScore.GetValueOrDefault(a, double.PositiveInfinity)));
         }
 
         public List<AbstractTile> Path => _robot.Path;
         public AbstractTile Start => _robot.Start;
         public AbstractTile Target => _robot.Target;
 
-        public void Search(IGraph graph, ref HashSet<(int, int, int)> reservationTable)
+        public virtual void Search(IGraph graph, ref HashSet<(int, int, int)> reservationTable, Func<AbstractTile, AbstractTile, double> h)
         {
-            _open.Add(Start);
             _gScore[Start] = 0;
-            _fScore[Start] = Helpers.Metrics.Manhattan(Start, Target);
+            _open.Enqueue(Start, h(Start, Target));
 
             AbstractTile current;
             while (_open.Count > 0)
             {
-                current = _open.Remove();
+                current = _open.Dequeue();
                 _closed.Add(current);
 
                 if (current == Target)
@@ -54,6 +52,7 @@ namespace MultiRobotSimulator.Core.Algos
                 var time = _time.GetValueOrDefault(current, 0);
 
                 var added = false;
+                var tentative_gScore = _gScore.GetValueOrDefault(current, double.PositiveInfinity) + 1;
                 foreach (var neighbor in graph.AdjacentVertices(current))
                 {
                     if (_closed.Contains(neighbor)
@@ -63,18 +62,17 @@ namespace MultiRobotSimulator.Core.Algos
                         continue;
                     }
 
-                    var gScore = _gScore.GetValueOrDefault(current, double.PositiveInfinity) + 1;
-                    if (gScore < _gScore.GetValueOrDefault(neighbor, double.PositiveInfinity))
+                    if (tentative_gScore < _gScore.GetValueOrDefault(neighbor, double.PositiveInfinity))
                     {
                         _cameFrom[neighbor] = current;
-                        _gScore[neighbor] = gScore;
-                        _fScore[neighbor] = gScore + Helpers.Metrics.Manhattan(neighbor, Target);
+                        _gScore[neighbor] = tentative_gScore;
                         _time[neighbor] = time + 1;
                         added = true;
 
-                        if (!_open.Contains(neighbor))
+                        var fScore = tentative_gScore + h(neighbor, Target);
+                        if (!_open.TryUpdatePriority(neighbor, fScore))
                         {
-                            _open.Add(neighbor);
+                            _open.Enqueue(neighbor, fScore);
                         }
                     }
                 }
@@ -82,9 +80,8 @@ namespace MultiRobotSimulator.Core.Algos
                 // wait
                 if (!added)
                 {
-                    _gScore[current] = _gScore.GetValueOrDefault(current, double.PositiveInfinity) + 1;
-                    _fScore[current] = _gScore[current] + Helpers.Metrics.Manhattan(current, Target);
-                    _open.Add(current);
+                    _gScore[current] = tentative_gScore;
+                    _open.Enqueue(current, tentative_gScore + h(current, Target));
                     _closed.Remove(current);
                     _time[current] = time + 1;
                     _wait[current] = _wait.GetValueOrDefault(current, 0) + 1;
@@ -138,7 +135,7 @@ namespace MultiRobotSimulator.Core.Algos
         {
             foreach (var robot in _coopAStarRobots)
             {
-                robot.Search(Graph.Clone(), ref _reservationTable);
+                robot.Search(Graph.Clone(), ref _reservationTable, Metrics.Manhattan);
             }
         }
     }

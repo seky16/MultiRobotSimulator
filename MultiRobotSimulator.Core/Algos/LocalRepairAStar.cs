@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using MultiRobotSimulator.Abstractions;
-using SD.Tools.Algorithmia.PriorityQueues;
+using Priority_Queue;
 
 namespace MultiRobotSimulator.Core.Algos
 {
@@ -56,14 +56,6 @@ namespace MultiRobotSimulator.Core.Algos
     public class LRAStarRobot
     {
         private readonly Robot _robot;
-        private Dictionary<AbstractTile, AbstractTile> _cameFrom;
-
-        private HashSet<AbstractTile> _closed;
-        private Dictionary<AbstractTile, double> _fScore; // ok to use dictionary (should be faster than HashTable https://docs.microsoft.com/en-us/dotnet/standard/collections/hashtable-and-dictionary-collection-types
-
-        private Dictionary<AbstractTile, double> _gScore;
-
-        private BinaryHeapPriorityQueue<AbstractTile> _open;
         private int _posIndex = 0;
 
         public LRAStarRobot(Robot robot)
@@ -82,46 +74,43 @@ namespace MultiRobotSimulator.Core.Algos
         {
             Path.RemoveRange(_posIndex, Path.Count - _posIndex);
 
-            _cameFrom = new Dictionary<AbstractTile, AbstractTile>();
-            _fScore = new Dictionary<AbstractTile, double>();
-            _gScore = new Dictionary<AbstractTile, double>();
-            _closed = new HashSet<AbstractTile>();
-            _open = new BinaryHeapPriorityQueue<AbstractTile>((a, b) => _fScore.GetValueOrDefault(b, double.PositiveInfinity).CompareTo(_fScore.GetValueOrDefault(a, double.PositiveInfinity)))
-            {
-                Position
-            };
-            _gScore[Position] = 0;
-            _fScore[Position] = Helpers.Metrics.Manhattan(Position, Target); // TODO add agitation noise (see Silver)
+            var cameFrom = new Dictionary<AbstractTile, AbstractTile>();
+            var gScore = new Dictionary<AbstractTile, double>();
+            var closed = new HashSet<AbstractTile>();
+            var open = new SimplePriorityQueue<AbstractTile, double>();
+
+            gScore[Position] = 0;
+            open.Enqueue(Position, Helpers.Metrics.Manhattan(Position, Target)); // TODO add agitation noise (see Silver)
 
             AbstractTile current;
-            while (_open.Count > 0)
+            while (open.Count > 0)
             {
-                current = _open.Remove();
-                _closed.Add(current);
+                current = open.Dequeue();
+                closed.Add(current);
 
                 if (current == Target)
                 {
-                    Path.AddRange(ReconstructPath(current));
+                    Path.AddRange(ReconstructPath(cameFrom, current));
                     return;
                 }
 
                 foreach (var neighbor in graph.AdjacentVertices(current))
                 {
-                    if (_closed.Contains(neighbor))
+                    if (closed.Contains(neighbor))
                     {
                         continue;
                     }
 
-                    var gScore = _gScore.GetValueOrDefault(current, double.PositiveInfinity) + 1; // TODO add agitation noise (see Silver)
-                    if (gScore < _gScore.GetValueOrDefault(neighbor, double.PositiveInfinity))
+                    var tentative_gScore = gScore.GetValueOrDefault(current, double.PositiveInfinity) + 1; // TODO add agitation noise (see Silver)
+                    if (tentative_gScore < gScore.GetValueOrDefault(neighbor, double.PositiveInfinity))
                     {
-                        _cameFrom[neighbor] = current;
-                        _gScore[neighbor] = gScore;
-                        _fScore[neighbor] = gScore + Helpers.Metrics.Manhattan(neighbor, Target);
+                        cameFrom[neighbor] = current;
+                        gScore[neighbor] = tentative_gScore;
 
-                        if (!_open.Contains(neighbor))
+                        var fScore = tentative_gScore + Helpers.Metrics.Manhattan(neighbor, Target);
+                        if (!open.TryUpdatePriority(neighbor, fScore))
                         {
-                            _open.Add(neighbor);
+                            open.Enqueue(neighbor, fScore);
                         }
                     }
                 }
@@ -135,13 +124,13 @@ namespace MultiRobotSimulator.Core.Algos
                 return Path[++_posIndex];
             }
 
-            return null; // TODO return Path[posIndex]
+            return null;
         }
 
-        private List<AbstractTile> ReconstructPath(AbstractTile current)
+        private static List<AbstractTile> ReconstructPath(Dictionary<AbstractTile, AbstractTile> cameFrom, AbstractTile current)
         {
             var path = new List<AbstractTile>() { current };
-            while (_cameFrom.TryGetValue(current, out var prev))
+            while (cameFrom.TryGetValue(current, out var prev))
             {
                 current = prev;
                 path.Add(current);
