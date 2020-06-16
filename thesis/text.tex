@@ -175,7 +175,155 @@ Visibility graph, Voronoi diagram
 
 \chapter{Metody}
 \section{Klasické metody}
-Dijkstra, A*
+\subsection{A*}
+\subsection{Local Repair A*}
+Zatímco použití běžného A* algoritmu je při hledání cesty pro jednoho robota plně dostačující, při pohybu více robotů ve stejný čas může tento přístup lehce selhat a dojít ke srážce mezi roboty. Běžný postup, používaný například i ve videohrách, je využití takzvaného \emph{Local Repair A*} (LRA*) algoritmu.
+
+Local Repair A* nejprve vyhledá pro každého robota nejkratší cestu pomocí klasického A* algoritmu (viz výše), nezávisle na ostatních. Bere v potaz pouze sousedy, kteří jsou v sousedních buňkách startovací pozice. Po vyhledání jednotlivých cest se po nich roboti začnou pohybovat. Při pohybu vždy robot kontroluje následující pozici, do které se má přesunout, a pokud by hrozila kolize, protože je na této pozici již jiný robot, označí tuto pozici jako překážku a přepočítá zbytek cesty do cíle s touto novou informací.
+
+% TODO obrázek ?
+
+Je možné (a velice časté), že dojde k zacyklení jednoho nebo více robotů. Jedno z řešení tohoto problému, je při každém přeplánování trasy zvýšit tzv. \emph{úroveň agitace}. Při hledání je potom přidán náhodný šum úměrný úrovni agitace k hodnotě heuristické funkce $h$. Zvýšením náhodnosti chování robotů při plánování nové cesty se předpokládá, že uniknou z problematického místa, protože si vyberou jinou cestu.
+
+Algoritmus Local Repair A* má několik nevýhod. Obzvláště v úzkých koridorech je velká pravděpodobnost ke vzniku zácpy, která může trvat dlouhou dobu, případně se ji nepodaří vyřešit vůbec. Roboti v zácpě neustále znovu plánují svoje cesty a tím dochází k opakovanému spouštění celého A* algoritmu. Toto vede k nepříznivému, \uv{neinteligentnímu} chování, případně k úplnému selhání hledání cesty.
+
+% TODO pseudokód? 
+
+\subsection{Cooperative A*}\label{sec:Coop}
+\emph{Cooperative A*} se snaží vyřešit problém LRA*, kdy roboti navzájem neznají plány ostatních. Je tedy potřebné, mít znalost nejen o statických překážkách, ale i o pohybu všech robotů. Jelikož není žádná možnost, jak do statické (2D) mapy zaznamenat dynamický pohyb robotů, je potřeba mapu rozšířit o další dimenzi -- čas. Při pohybu mřížkou se tedy nemění pouze souřadnice polohy, např. $\left(x,y\right)\to\left(x,y+1\right)$, ale i časová souřadnice $\left(x,y,t\right)\to\left(x,y+1,t+1\right)$. V některých situacích, například při zácpě před úzkým koridorem, je výhodné nedělat nic a počkat, než se prostor vyčistí. Je tedy vhodné zavést jednu další akci \emph{čekat (wait)}, kdy přecházíme ze stavu $\left(x,y,t\right)$ do stavu $\left(x,y,t+1\right)$.
+
+Hledání cesty tedy provádíme na této 3D mřížce, kde cena přechodu mezi stavy je rovna době, kterou zabere přechod mezi nimi, tedy jedna. Přechod je přípustný, pokud v cílové buňce není překážka nebo jiný robot.
+%(bude vysvětleno později -- viz \hyperref[sec:reservationTable]{rezervační tabulka})
+A* algoritmus nalezne cestu s nejnižší cenovou funkcí, tj. nejrychlejší cestu do cíle. Tato cena může být vyšší než samotná délka cesty, kvůli již zmíněné akci \emph{čekat}. 
+
+\subsubsection{Rezervační tabulka}\label{sec:reservationTable}
+
+Pro zohlednění pohybu robotů se využívá tzv. \emph{rezervační tabulka}. Po té, co každý robot naplánuje svoji cestu, je každý stav této cesty zaznamenán do rezervační tabulky. Každý stav zanesený do této tabulky je při plánování dalšími roboty považován za překážku v na dané pozici v daném čase. 
+
+% TODO předělat obrázek
+\begin{figure}[!h]
+	\begin{center}
+		\includegraphics*[scale=0.5]{obr/reservationTable}
+	\end{center}
+	\caption[caption]{Rezervační tabulka [coop-path-AIWisdom]}
+	\label{obr:reservationTable}
+\end{figure}
+
+Na obrázku \ref{obr:reservationTable} můžeme vidět, jak Cooperative A* funguje. První robot (vlevo), nalezne cestu do svého cíle a jednotlivé stavy zaznamená do rezervační tabulky. Druhý robot při svém plánování považuje tyto stavy za překážky, tím se vyhne kolizi s prvním robotem a úspěšně nalezne cestu do cíle. Tuto cestu poté také zaznamená do rezervační tabulky.
+
+Rezervační tabulka bohužel nezohledňuje situaci, kdy roboti jedou přímo naproti sobě. Pokud například první robot zarezervuje stavy $\left(x,y,t\right)$ a $\left(x+1,y,t+1\right)$, druhému robotovi nic nebrání v tom zarezervovat stavy $\left(x+1,y,t\right)$ a $\left(x,y,t+1\right)$. Řešením je buď zaznačit do rezervační tabulky jak cílový, tak výchozí stav akce, případně explicitně kontrolovat přímé kolize.
+
+% TODO přesunout do implementace?
+Jednou z nevýhod Cooperative A* algoritmu, je již zmíněná přidaná dimenze navíc, která značně zvyšuje výpočetní náročnost algoritmu. Rezervační tabulka, je naštěstí z podstaty řídká, jelikož počet rezervací v daném časovém okamžiku je přímo úměrný počtu robotů. Tabulku lze tedy efektivně implementovat jako hašovací tabulku, kde klíčem je daný stav $\left(x,y,t\right)$.
+
+Další z nevýhod je, že Cooperative A* (stejně jako žádný jiný distribuovaný hladový algoritmus) nedokáže vyřešit určité typy problémů, kdy řešení jednoho robota zamezí v možnosti dalšího robota nalézt přípustnou cestu. Jeden příklad tohoto problému můžeme vidět na obrázku \ref{obr:unsolvableCoopProblem}. První robot při naplánování cesty z výchozí pozice $S_1$ do cíle $G_1$ zamezí v cestě druhému robotu, který se snaží naplánovat cestu z pozice $S_2$ do cíle $G_2$.
+
+% TODO předělat obrázek
+\begin{figure}[!h]
+	\begin{center}
+		\includegraphics*[scale=0.5]{obr/unsolvableCoopProblem}
+	\end{center}
+	\caption[caption]{Příklad problému, který nelze vyřešit pomocí Cooperative A* [Silver05]}
+	\label{obr:unsolvableCoopProblem}
+\end{figure}
+
+Pro Cooperative A* lze použít libovolnou přípustnou heuristickou funkci. Při využití mřížkových map se nejčastěji používá Manhattanská metrika. Při použití na složitých mapách, kde dochází k plánování cyklických cest, je ovšem tato metrika nedostatečná.
+
+% TODO předělat obrázek, rozdělit do dvou?
+\begin{figure}[!h]
+	\begin{center}
+		\includegraphics*[scale=0.5]{obr/coopManh}
+	\end{center}
+	\caption[caption]{Použití Manhattanské metriky v Cooperative A* [coop-path-AIWisdom]}
+	\label{obr:coopManh}
+\end{figure}
+
+Na obrázku \ref{obr:coopManh} vlevo vidíme hodnoty $f$ buněk, které při plánování prohledá A* algoritmus. Vidíme, že algoritmus prohledal skoro všechny buňky, i ty co reálně nevedou k cíli. Při použití Cooperative A*, tedy plánování v prostoru rozšířeném o jednu dimenzi, vidíme na obrázku \ref{obr:coopManh} vpravo, že tento algoritmus prohledává dané buňky několikrát, vždy v různých časech. Algoritmus se snaží vrátit zpět a prohledat buňky s lepší hodnotou $f$ v dalších časech a tím se několikanásobně zhoršuje časová náročnost tohoto algoritmu.
+
+\subsection{Hierarchical Cooperative A*}
+%Heuristickou funkci lze zlepšit pomocí abstrakce stavového prostoru. Jelikož je díky přítomnosti více robotů prostředí dynamické, je nutné použít \emph{Hierarchical A*}, který počítá abstraktní vzdálenosti na požádání.
+
+%\emph{Hierarchical Cooperative A*} využívá jednoduchou abstrakci, kterou je 
+
+Heuristickou funkci lze zlepšit pomocí abstrakce stavového prostoru.  Jako odhad vzdálenosti z dané buňky do cíle použijeme nejkratší možnou vzdálenost bez závislosti na čase a ostatních robotech. Jedná se tedy o délku cesty nalezenou A* algoritmem na 2D mřížce. Tuto vzdálenost nazveme \emph{pravá vzdálenost}.
+
+% TODO předělat obrázek
+\begin{figure}[!h]
+	\begin{center}
+		\includegraphics*[scale=0.5]{obr/hierarchCoopMetric}
+	\end{center}
+	\caption[caption]{Použití pravé vzdálenosti [coop-path-AIWisdom]}
+	\label{obr:hierarchCoopMetric}
+\end{figure}
+
+Na obrázku \ref{obr:hierarchCoopMetric} vidíme, že při použití pravé vzdálenosti je počet prohledaných buněk minimální a robot postupuje přesně podél nejkratší cesty až do cíle. Pouze pokud při cestě narazí na další roboty, prohledá buňky navíc. Čas prohledávání je tedy přímo úměrný potřebné úrovni kooperace mezi roboty.
+
+Pravou vzdálenost je potřebné spočítat pro každou buňku, kterou Cooperative A* prohledá. Pokud bychom pokaždé hledali cestu z dané buňky do cíle pomocí klasického A* algoritmu, bylo by celkové plánování cesty ještě pomalejší, než použití horší heuristické funkce. Jednou z možností je spočítat všechny abstraktní vzdálenosti dopředu, ale z důvodu, že se jedná o dynamický problém a tyto vzdálenosti bychom museli počítat pro každého robota, není toto řešení adekvátní. Další možností je využití \emph{Hierarchical A*}, který počítá abstraktní vzdálenosti na požádání.
+
+\subsubsection{Reverse Resumable A*}
+Jednou z vlastností A* algoritmu je, že pokud využíváme konzistentní heuristickou funkci, tak při prohledávání dané buňky (při vložení do seznamu \emph{closed}) známe nejkratší cestu z výchozí pozice do této buňky $g$.
+
+Této vlastnosti můžeme využít a hledat cestu "pozpátku". Začneme-li v cílové pozici, tak po dokončení prohledávání (jakmile dojdeme do počáteční pozice) vidíme (jak ukazuje obrázek \ref{obr:backwardsSearch}), že hodnoty $g$ pro každou prohledanou buňku obsahují reálnou nejkratší vzdálenost do cíle.
+
+\begin{figure}[!h]
+	\begin{center}
+		\includegraphics*[scale=0.5]{obr/backwardsSearch}
+	\end{center}
+	\caption[caption]{Příklad zpětného prohledávání [coop-path-AIWisdom]}
+	\label{obr:backwardsSearch}
+\end{figure}
+
+Po nalezení cesty pomocí zpětného prohledávání nemusíme mít expandované všechny potřebné buňky a tedy jejich $g$ hodnoty. Naštěstí můžeme v prohledávání znovu pokračovat, dokud nenarazíme na danou buňku. Tento postup nazveme \emph{Reverse Resumable A*}, jehož pseudokód je popsán v algoritmu \ref{alg:RRA}.
+\\
+\\
+Cooperative A*, který jako heuristickou funkci používá pravou vzdálenost nazveme \emph{Hierarchical Cooperative A*}. Plánování cesty tedy probíhá tak, jak je popsáno v podkapitole \ref{sec:Coop}. Pro odhad vzdálenosti voláme metodu \texttt{AbstractDict}, která ověří, jestli je daná buňka expandovaná. Pokud ano, vrátíme její $g$ hodnotu. Pokud není, pokračujeme v hledání pomocí Reverse Resumable A* algoritmu, dokud neexpandujeme požadovanou buňku a nezískáme tak její $g$ hodnotu.
+
+\begin{algorithm}[H]
+	\caption{Reverse Resumable A*}
+	\label{alg:RRA}
+	\begin{algorithmic}[1]
+		\Function{InitialiseRRA*}{$S,G$}
+			\State $G.g\gets 0$
+			\State $G.h\gets$ \Call{Heuristic}{$G,O$}
+			\State $Open\gets\left\{ G \right\}$
+			\State $Closed\gets\emptyset$
+			\State \Call{ResumeRRA*}{$O$}
+		\EndFunction
+		\Statex
+		\Function{ResumeRRA*}{$N$}
+			\While{$Open\neq\emptyset$}
+				\State $P\gets Open.pop()$
+				\State $Closed.add(P)$
+				\If{$P=N$}
+					\State \textbf{return} success
+				\EndIf
+				\ForAll{$Q\in$ \Call{Neighbors}{$P$}.$reverse()$}
+					\State $tempG\gets P.g+$ \Call{Cost}{P,Q}
+					\State $tempH\gets$ \Call{Heuristic}{$G,O$}
+					\If{$Q\notin Open$ \textbf{and} $Q\notin Closed$}
+						\State $Open.add(Q)$ with $f=\infty$
+					\EndIf
+					\If{$Q\in Open$ \textbf{and} $(tempG+tempH)<Q.f$}
+						\State $Q.g=tempG$
+						\State $Q.h=tempH$
+					\EndIf
+				\EndFor
+			\EndWhile
+			\State \textbf{return} failure
+		\EndFunction
+		\Statex
+		\Function{AbstractDist}{$N$}
+			\If{$N\in Closed$}
+				\State \textbf{return} $N.g$
+			\EndIf
+			\If{\Call{ResumeRRA*}{$N$} = success}
+				\State \textbf{return} $N.g$
+			\EndIf
+			\State \textbf{return} $+\infty$
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+ 
 \section{Heuristické metody}
 Probabilistic Roadmaps, Rapidly-exploring Random Trees, Neural Networks, Genetic Algs, Simulated Annealing, ACO, PSO, Fuzzy
 
@@ -184,9 +332,8 @@ Probabilistic Roadmaps, Rapidly-exploring Random Trees, Neural Networks, Genetic
 \subsection{GUI}
 \subsection{Plug-in systém}
 \subsection{MovingAI benchmarks}
-
-\section{Local Repair A*}
-\section{Cooperative A*}
+\subsection{Implementované algoritmy}
+LRA*, CA*, HCA*
 
 \chapter{Vyhodnocení výsledků}
 
