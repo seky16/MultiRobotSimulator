@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 ### Removed
 
+## [0.7.0] (2020-06-17)
+### Added
+- [Octile metric](https://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html#diagonal-distance)
+- Rendering paths with distinct colors
+### Changed
+- CA* and HCA* will no longer solve unsolvable problems
+
 ## [0.6.0] (2020-06-15)
 ### Added
 - Hierarchical Cooperative A* implementation [[Silver](https://www.davidsilver.uk/wp-content/uploads/2020/01/coop-path-AIIDE.pdf)]
@@ -66,7 +73,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Drawing obstacles/starts/finishes
 
 
-[Unreleased]: https://github.com/seky16/MultiRobotSimulator/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/seky16/MultiRobotSimulator/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/seky16/MultiRobotSimulator/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/seky16/MultiRobotSimulator/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/seky16/MultiRobotSimulator/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/seky16/MultiRobotSimulator/compare/v0.3.0...v0.4.0
