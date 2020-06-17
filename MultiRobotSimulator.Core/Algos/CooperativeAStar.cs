@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -37,6 +37,15 @@ namespace MultiRobotSimulator.Core.Algos
                 current = _open.Dequeue();
                 _closed.Add(current);
 
+                var time = _time.GetValueOrDefault(current, 0);
+
+                // current tile is reserved, we can't be here
+                if (reservationTable.Contains((current.X, current.Y, time))
+                    || reservationTable.Contains((current.X, current.Y, time + 1)))
+                {
+                    continue;
+                }
+
                 if (current == Target)
                 {
                     Path.AddRange(ReconstructPath(current));
@@ -48,8 +57,6 @@ namespace MultiRobotSimulator.Core.Algos
 
                     return;
                 }
-
-                var time = _time.GetValueOrDefault(current, 0);
 
                 var added = false;
                 foreach (var neighbor in graph.AdjacentVertices(current))
@@ -100,11 +107,6 @@ namespace MultiRobotSimulator.Core.Algos
 
             while (_cameFrom.TryGetValue(current, out var prev))
             {
-                if (path.Count > 100)
-                {
-                    break;
-                }
-
                 current = prev;
                 path.Add(current);
             }
