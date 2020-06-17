@@ -50,7 +50,7 @@ namespace MultiRobotSimulator.Core.Algos
             _open = new Priority_Queue.SimplePriorityQueue<AbstractTile, double>();
 
             _gScore[target] = 0;
-            _open.Enqueue(target, Metrics.Manhattan(target, start));
+            _open.Enqueue(target, Metrics.Octile(target, start));
 
             Resume(start);
         }
@@ -84,8 +84,8 @@ namespace MultiRobotSimulator.Core.Algos
 
                 foreach (var q in _graph.AdjacentVertices(p).Reverse())
                 {
-                    var gScore = _gScore.GetValueOrDefault(p, double.PositiveInfinity) + 1;
-                    var fScore = gScore + Metrics.Manhattan(q, _start);
+                    var gScore = _gScore.GetValueOrDefault(p, double.PositiveInfinity) + Metrics.Octile(p, q);
+                    var fScore = gScore + Metrics.Octile(q, _start);
 
                     if (!_open.Contains(q) && !_closed.Contains(q))
                     {

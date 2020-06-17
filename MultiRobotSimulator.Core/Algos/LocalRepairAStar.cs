@@ -80,7 +80,7 @@ namespace MultiRobotSimulator.Core.Algos
             var open = new SimplePriorityQueue<AbstractTile, double>();
 
             gScore[Position] = 0;
-            open.Enqueue(Position, Helpers.Metrics.Manhattan(Position, Target)); // TODO add agitation noise (see Silver)
+            open.Enqueue(Position, Helpers.Metrics.Octile(Position, Target)); // TODO add agitation noise (see Silver)
 
             AbstractTile current;
             while (open.Count > 0)
@@ -101,13 +101,13 @@ namespace MultiRobotSimulator.Core.Algos
                         continue;
                     }
 
-                    var tentative_gScore = gScore.GetValueOrDefault(current, double.PositiveInfinity) + 1; // TODO add agitation noise (see Silver)
+                    var tentative_gScore = gScore.GetValueOrDefault(current, double.PositiveInfinity) + Helpers.Metrics.Octile(current, neighbor); // TODO add agitation noise (see Silver)
                     if (tentative_gScore < gScore.GetValueOrDefault(neighbor, double.PositiveInfinity))
                     {
                         cameFrom[neighbor] = current;
                         gScore[neighbor] = tentative_gScore;
 
-                        var fScore = tentative_gScore + Helpers.Metrics.Manhattan(neighbor, Target);
+                        var fScore = tentative_gScore + Helpers.Metrics.Octile(neighbor, Target);
                         if (!open.TryUpdatePriority(neighbor, fScore))
                         {
                             open.Enqueue(neighbor, fScore);
