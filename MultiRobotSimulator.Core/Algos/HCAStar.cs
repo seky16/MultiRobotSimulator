@@ -20,6 +20,7 @@ namespace MultiRobotSimulator.Core.Algos
             _HCAStarRobots = new List<CoopAStarRobot>(Robots.Count);
             foreach (var robot in Robots)
             {
+                _reservationTable.Add((robot.Start.X, robot.Start.Y, 0));
                 _HCAStarRobots.Add(new CoopAStarRobot(robot));
             }
         }

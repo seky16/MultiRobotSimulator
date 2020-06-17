@@ -40,8 +40,8 @@ namespace MultiRobotSimulator.Core.Algos
                 var time = _time.GetValueOrDefault(current, 0);
 
                 // current tile is reserved, we can't be here
-                if (reservationTable.Contains((current.X, current.Y, time))
-                    || reservationTable.Contains((current.X, current.Y, time + 1)))
+                if (current != Start && (reservationTable.Contains((current.X, current.Y, time))
+                    || reservationTable.Contains((current.X, current.Y, time + 1))))
                 {
                     continue;
                 }
@@ -129,6 +129,7 @@ namespace MultiRobotSimulator.Core.Algos
             _coopAStarRobots = new List<CoopAStarRobot>(Robots.Count);
             foreach (var robot in Robots)
             {
+                _reservationTable.Add((robot.Start.X, robot.Start.Y, 0));
                 _coopAStarRobots.Add(new CoopAStarRobot(robot));
             }
         }
