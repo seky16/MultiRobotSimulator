@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -117,6 +117,18 @@ namespace MultiRobotSimulator.Core.Models
             }
 
             return result;
+        }
+
+        public void ClearRobots()
+        {
+            Starts.Clear();
+            Targets.Clear();
+
+            foreach (var tile in _wrappedGraph.Vertices)
+            {
+                tile.IsStart = false;
+                tile.IsTarget = false;
+            }
         }
 
         public IEnumerable<Tile> GetNeighbors(Tile tile)

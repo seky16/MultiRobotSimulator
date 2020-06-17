@@ -133,6 +133,7 @@ namespace MultiRobotSimulator.WPF.Pages
             // draw background
             drawingContext.DrawRectangle(Brushes.White, null, new Rect(new Point(), RenderSize));
 
+            RenderGraph(drawingContext);
             RenderGrid(drawingContext);
 
             if (_rootVM?.RenderPaths ?? false)
@@ -141,7 +142,6 @@ namespace MultiRobotSimulator.WPF.Pages
             }
 
             RenderTiles(drawingContext);
-            RenderGraph(drawingContext);
 
             // pop back guidelines set
             drawingContext.Pop();

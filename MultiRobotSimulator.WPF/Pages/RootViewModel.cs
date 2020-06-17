@@ -27,7 +27,7 @@ namespace MultiRobotSimulator.WPF.Pages
         private readonly IWindowManager _windowManager;
         private DrawingMode _drawingMode;
         private bool _renderGraph;
-        private bool _renderPaths;
+        private bool _renderPaths = true;
         private Guid _selectedAlgo;
         private int untitledIndex = 0;
 
@@ -142,6 +142,14 @@ namespace MultiRobotSimulator.WPF.Pages
             _logger.LogInformation("Clearing map '{displayName}'", ActiveItem.DisplayName);
 
             ActiveItem.HasChanges |= ActiveItem.Map.ClearAll();
+            AlgoResult = null;
+            _eventAggregator.Publish(new CanvasRedrawEvent());
+        }
+
+        public void EditorClearRobots()
+        {
+            _logger.LogInformation("Clearing robots on '{displayName}'", ActiveItem.DisplayName);
+
             AlgoResult = null;
             _eventAggregator.Publish(new CanvasRedrawEvent());
         }
