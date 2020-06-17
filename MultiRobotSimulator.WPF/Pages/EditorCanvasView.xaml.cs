@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -35,6 +36,8 @@ namespace MultiRobotSimulator.WPF.Pages
 
         public double CellSize { get; private set; }
 
+        private double LineWidth => CellSize * 0.05;
+
         private void DrawTextAtCenter(DrawingContext drawingContext, object text, Point center)
         {
             var str = text.ToString() ?? string.Empty;
@@ -62,6 +65,8 @@ namespace MultiRobotSimulator.WPF.Pages
             {
                 return;
             }
+
+            _rootVM.AlgoResult = null;
 
             var screenPos = e.GetPosition(this);
             var canvasPos = screenPos.ScreenToCanvas(CellSize);
@@ -96,14 +101,17 @@ namespace MultiRobotSimulator.WPF.Pages
 
             _logger.LogTrace("Canvas render '{name}'", _tab?.DisplayName);
 
-            var sw = Stopwatch.StartNew();
-            // https://stackoverflow.com/a/44426783
-            var drawingContext = _backingStore.Open();
-            Render(drawingContext);
-            drawingContext.Close();
-            sw.Stop();
+            Execute.PostToUIThread(() =>
+            {
+                var sw = Stopwatch.StartNew();
+                // https://stackoverflow.com/a/44426783
+                var drawingContext = _backingStore.Open();
+                Render(drawingContext);
+                drawingContext.Close();
+                sw.Stop();
 
-            _logger.LogTrace("{action} took {ms} ms", "Render", sw.ElapsedMilliseconds);
+                _logger.LogTrace("{action} took {ms} ms", "Render", sw.ElapsedMilliseconds);
+            });
         }
 
         private void Render(DrawingContext drawingContext)
@@ -114,10 +122,8 @@ namespace MultiRobotSimulator.WPF.Pages
                 return;
             }
 
-            var gridPen = new Pen(Brushes.Gray, CellSize * 0.05);
-
             // assure pixel perfect drawing
-            var halfPenWidth = gridPen.Thickness / 2;
+            var halfPenWidth = LineWidth / 2;
             var guidelines = new GuidelineSet();
             guidelines.GuidelinesX.Add(halfPenWidth);
             guidelines.GuidelinesY.Add(halfPenWidth);
@@ -127,18 +133,7 @@ namespace MultiRobotSimulator.WPF.Pages
             // draw background
             drawingContext.DrawRectangle(Brushes.White, null, new Rect(new Point(), RenderSize));
 
-            var width = RenderSize.Width;
-            var height = RenderSize.Height;
-
-            // draw grid
-            for (var i = 0d; i < width; i += CellSize)
-            {
-                drawingContext.DrawLine(gridPen, new Point(i, 0), new Point(i, height));
-            }
-            for (var i = 0d; i < height; i += CellSize)
-            {
-                drawingContext.DrawLine(gridPen, new Point(0, i), new Point(width, i));
-            }
+            RenderGrid(drawingContext);
 
             if (_rootVM?.RenderPaths ?? false)
             {
@@ -161,17 +156,51 @@ namespace MultiRobotSimulator.WPF.Pages
 
             var graph = _tab.Map;
             var edges = graph.Edges;
-            var pen = new Pen(Brushes.Purple, 1);
 
-            foreach ((var t1, var t2) in edges)
+            var geometry = new StreamGeometry();
+            using (var ctx = geometry.Open())
             {
-                if (!(t1 is Tile tile1) || !(t2 is Tile tile2))
+                foreach ((var t1, var t2) in edges)
                 {
-                    continue;
+                    if (!(t1 is Tile tile1) || !(t2 is Tile tile2))
+                    {
+                        continue;
+                    }
+
+                    ctx.BeginFigure(tile1.GetRect(CellSize).Center(), true, true);
+                    ctx.LineTo(tile2.GetRect(CellSize).Center(), false, false);
+                }
+            }
+
+            geometry.Freeze();
+
+            drawingContext.DrawGeometry(null, new Pen(Brushes.Purple, 1), geometry);
+        }
+
+        private void RenderGrid(DrawingContext drawingContext)
+        {
+            var width = RenderSize.Width;
+            var height = RenderSize.Height;
+
+            var geometry = new StreamGeometry();
+            using (var ctx = geometry.Open())
+            {
+                for (var i = 0d; i < width; i += CellSize)
+                {
+                    ctx.BeginFigure(new Point(i, 0), true, true);
+                    ctx.LineTo(new Point(i, height), false, false);
                 }
 
-                drawingContext.DrawLine(pen, tile1.GetRect(CellSize).Center(), tile2.GetRect(CellSize).Center());
+                for (var i = 0d; i < height; i += CellSize)
+                {
+                    ctx.BeginFigure(new Point(0, i), true, true);
+                    ctx.LineTo(new Point(width, i), false, false);
+                }
             }
+
+            geometry.Freeze();
+
+            drawingContext.DrawGeometry(null, new Pen(Brushes.Gray, LineWidth), geometry);
         }
 
         private void RenderPaths(DrawingContext drawingContext)
@@ -185,18 +214,21 @@ namespace MultiRobotSimulator.WPF.Pages
             for (var p = 0; p < paths.Count; p++)
             {
                 var path = paths.ElementAt(p);
-                if (path.Count == 0) continue;
-
-                var pen = new Pen(DistinctColors.GetBrush(p), 1);
-
-                var source = path.First();
-
-                for (var i = 1; i < path.Count; i++)
+                if (path.Count == 0)
                 {
-                    var target = path.ElementAt(i);
-                    drawingContext.DrawLine(pen, source.GetRect(CellSize).Center(), target.GetRect(CellSize).Center());
-                    source = target;
+                    continue;
                 }
+
+                var geometry = new StreamGeometry();
+                using (var ctx = geometry.Open())
+                {
+                    ctx.BeginFigure(path.First().GetRect(CellSize).Center(), true, false);
+                    ctx.PolyLineTo(path.Select(t => t.GetRect(CellSize).Center()).ToList(), true, true);
+                }
+
+                geometry.Freeze();
+
+                drawingContext.DrawGeometry(null, new Pen(DistinctColors.GetBrush(p), LineWidth), geometry);
             }
         }
 
@@ -207,10 +239,20 @@ namespace MultiRobotSimulator.WPF.Pages
                 return;
             }
 
-            foreach (var obstacle in _tab.Map.Vertices.Where(t => !t.Passable))
+            var geometry = new StreamGeometry();
+            using (var ctx = geometry.Open())
             {
-                drawingContext.DrawRectangle(Brushes.Black, null, obstacle.GetRect(CellSize));
+                foreach (var obstacle in _tab.Map.Vertices.Where(t => !t.Passable))
+                {
+                    var rect = obstacle.GetRect(CellSize);
+                    ctx.BeginFigure(rect.TopLeft, true, true);
+                    ctx.PolyLineTo(new List<Point>() { rect.TopRight, rect.BottomRight, rect.BottomLeft }, false, false);
+                }
             }
+
+            geometry.Freeze();
+
+            drawingContext.DrawGeometry(Brushes.Black, null, geometry);
 
             for (var i = 0; i < _tab.Map.Starts.Count; i++)
             {
