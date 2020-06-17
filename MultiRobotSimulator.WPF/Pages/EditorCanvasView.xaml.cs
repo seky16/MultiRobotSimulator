@@ -144,7 +144,7 @@ namespace MultiRobotSimulator.WPF.Pages
 
             if (_rootVM?.RenderPaths ?? false)
             {
-                RenderPath(drawingContext);
+                RenderPaths(drawingContext);
             }
 
             // pop back guidelines set
@@ -173,7 +173,7 @@ namespace MultiRobotSimulator.WPF.Pages
             }
         }
 
-        private void RenderPath(DrawingContext drawingContext)
+        private void RenderPaths(DrawingContext drawingContext)
         {
             var paths = _rootVM?.AlgoResult?.Paths;
             if (paths is null || paths.Count == 0)

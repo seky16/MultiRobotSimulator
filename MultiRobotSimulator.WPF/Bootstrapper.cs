@@ -29,7 +29,7 @@ namespace MultiRobotSimulator.WPF
             builder.Assemblies.Add(Assembly.Load("MultiRobotSimulator.Core"));
             builder.Assemblies.Add(Assembly.Load("MultiRobotSimulator.Abstractions"));
 
-            // load dotnet plugin assemblies
+            // load plugin assemblies
             foreach (var dll in Directory.EnumerateFiles(Path.Combine(Directory.GetCurrentDirectory(), "plugins"), "*.dll"))
             {
                 _logger.Info("Loading {dll}", dll);
@@ -37,7 +37,6 @@ namespace MultiRobotSimulator.WPF
                 builder.Assemblies.Add(ass);
             }
 
-            // todo add plugin assemblies here, and add to Stylet IoC using .ToAllImplementations();
             builder.Bind<IAlgo>().ToAllImplementations();
 
             // singletons

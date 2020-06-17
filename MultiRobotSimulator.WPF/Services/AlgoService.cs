@@ -21,36 +21,23 @@ namespace MultiRobotSimulator.WPF.Services
             _logger = logger;
             _eventAggregator = eventAggregator;
 
-            // dotnet
-            DotnetAlgos = container.GetAll<IAlgo>().ToDictionary(_ => Guid.NewGuid());
-            _logger.LogInformation("Found {count} algorithms of type {type}", DotnetAlgos.Count, "dotnet");
+            Algos = container.GetAll<IAlgo>().ToDictionary(_ => Guid.NewGuid());
+            _logger.LogInformation("Found {count} algorithms of type {type}", Algos.Count, "dotnet");
 
-            foreach (var dotnetAlgo in DotnetAlgos)
+            foreach (var algo in Algos)
             {
-                var type = string.Empty;
-                if (dotnetAlgo.Value is AbstractSingleRobotAlgo)
-                {
-                    type = "SR";
-                }
-                else
-                {
-                    type = "MR";
-                }
-
-                var name = $"{dotnetAlgo.Value.Name} ({type}) dotnet";
-
-                DisplayNames.Add(dotnetAlgo.Key, name);
+                DisplayNames.Add(algo.Key, algo.Value.Name);
             }
         }
 
         public Dictionary<Guid, string> DisplayNames { get; } = new Dictionary<Guid, string>();
-        public Dictionary<Guid, IAlgo> DotnetAlgos { get; }
+        public Dictionary<Guid, IAlgo> Algos { get; }
 
         internal void RunSearch(Guid guid, Map graph)
         {
             _logger.LogInformation("Begin search with algorithm {name} (graph V={nodes}, E={edges})", DisplayNames[guid], graph.Vertices.Count(), graph.Edges.Count());
 
-            if (DotnetAlgos.TryGetValue(guid, out var dotnetAlgo))
+            if (Algos.TryGetValue(guid, out var algo))
             {
                 var sw = Stopwatch.StartNew();
 
@@ -60,16 +47,16 @@ namespace MultiRobotSimulator.WPF.Services
                     robots.Add(new Robot(graph.Starts[i], graph.Targets[i]));
                 }
 
-                dotnetAlgo.InitializeInternal(graph.Clone(), robots);
+                algo.InitializeInternal(graph.Clone(), robots);
                 var initTime = sw.ElapsedMilliseconds;
-                _logger.LogInformation("{action} took {ms} ms", "dotnet init", initTime);
+                _logger.LogInformation("{action} took {ms} ms", "init", initTime);
 
                 sw.Restart();
-                dotnetAlgo.RunSearch();
+                algo.RunSearch();
                 sw.Stop();
-                _logger.LogInformation("{action} took {ms} ms", "dotnet search", sw.ElapsedMilliseconds);
+                _logger.LogInformation("{action} took {ms} ms", "search", sw.ElapsedMilliseconds);
 
-                var result = new AlgoResult(dotnetAlgo, initTime, sw.ElapsedMilliseconds);
+                var result = new AlgoResult(algo, initTime, sw.ElapsedMilliseconds);
 
                 _eventAggregator.Publish(new SearchDoneEvent(result));
             }
