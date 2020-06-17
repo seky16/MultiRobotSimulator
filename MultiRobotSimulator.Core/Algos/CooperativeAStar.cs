@@ -59,7 +59,6 @@ namespace MultiRobotSimulator.Core.Algos
                 }
 
                 var added = false;
-                var tempG = _gScore.GetValueOrDefault(current, double.PositiveInfinity) + 1;
                 foreach (var neighbor in graph.AdjacentVertices(current))
                 {
                     if (_closed.Contains(neighbor)
@@ -69,14 +68,15 @@ namespace MultiRobotSimulator.Core.Algos
                         continue;
                     }
 
-                    if (tempG < _gScore.GetValueOrDefault(neighbor, double.PositiveInfinity))
+                    var tentative_gScore = _gScore.GetValueOrDefault(current, double.PositiveInfinity) + Metrics.Octile(current, neighbor);
+                    if (tentative_gScore < _gScore.GetValueOrDefault(neighbor, double.PositiveInfinity))
                     {
                         _cameFrom[neighbor] = current;
-                        _gScore[neighbor] = tempG;
+                        _gScore[neighbor] = tentative_gScore;
                         _time[neighbor] = time + 1;
                         added = true;
 
-                        var fScore = tempG + h(neighbor, Target);
+                        var fScore = tentative_gScore + h(neighbor, Target);
                         if (!_open.TryUpdatePriority(neighbor, fScore))
                         {
                             _open.Enqueue(neighbor, fScore);
@@ -87,8 +87,8 @@ namespace MultiRobotSimulator.Core.Algos
                 // wait
                 if (!added)
                 {
-                    _gScore[current] = tempG;
-                    _open.Enqueue(current, tempG + h(current, Target));
+                    _gScore[current] = _gScore.GetValueOrDefault(current, double.PositiveInfinity) + 1;
+                    _open.Enqueue(current, _gScore[current] + h(current, Target));
                     _closed.Remove(current);
                     _time[current] = time + 1;
                     _wait[current] = _wait.GetValueOrDefault(current, 0) + 1;
