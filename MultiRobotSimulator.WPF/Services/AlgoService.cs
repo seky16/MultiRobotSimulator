@@ -30,8 +30,8 @@ namespace MultiRobotSimulator.WPF.Services
             }
         }
 
-        public Dictionary<Guid, string> DisplayNames { get; } = new Dictionary<Guid, string>();
         public Dictionary<Guid, IAlgo> Algos { get; }
+        public Dictionary<Guid, string> DisplayNames { get; } = new Dictionary<Guid, string>();
 
         internal void RunSearch(Guid guid, Map graph)
         {
