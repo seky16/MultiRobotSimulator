@@ -44,7 +44,7 @@ namespace MultiRobotSimulator.WPF.Services
                 var robots = new List<Robot>();
                 for (var i = 0; i < graph.Starts.Count; i++)
                 {
-                    robots.Add(new Robot(graph.Starts[i], graph.Targets[i]));
+                    robots.Add(algo.RobotFactory(graph.Starts[i], graph.Targets[i]));
                 }
 
                 algo.InitializeInternal(graph.Clone(), robots);

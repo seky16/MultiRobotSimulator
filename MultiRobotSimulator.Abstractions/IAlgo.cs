@@ -11,6 +11,8 @@ namespace MultiRobotSimulator.Abstractions
 
         void InitializeInternal(IGraph graph, IReadOnlyCollection<Robot> robots);
 
+        Robot RobotFactory(AbstractTile start, AbstractTile target);
+
         void RunSearch();
     }
 }

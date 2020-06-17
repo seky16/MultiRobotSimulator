@@ -67,6 +67,11 @@ namespace MultiRobotSimulator.Abstractions
             Initialize();
         }
 
+        public virtual Robot RobotFactory(AbstractTile start, AbstractTile target)
+        {
+            return new Robot(start, target);
+        }
+
         public abstract void RunSearch();
     }
 }

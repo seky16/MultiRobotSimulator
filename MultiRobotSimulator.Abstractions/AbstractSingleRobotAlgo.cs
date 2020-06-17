@@ -26,6 +26,7 @@ namespace MultiRobotSimulator.Abstractions
         }
 
         public bool Initialized { get; private set; }
+
         public abstract string Name { get; }
 
         public Robot Robot => Robots.First();
@@ -75,6 +76,11 @@ namespace MultiRobotSimulator.Abstractions
             Robots = robots;
 
             Initialize();
+        }
+
+        public virtual Robot RobotFactory(AbstractTile start, AbstractTile target)
+        {
+            return new Robot(start, target);
         }
 
         public abstract void RunSearch();
