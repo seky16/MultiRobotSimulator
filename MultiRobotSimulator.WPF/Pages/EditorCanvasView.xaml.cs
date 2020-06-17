@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using MultiRobotSimulator.Core.Enums;
 using MultiRobotSimulator.Core.Models;
 using MultiRobotSimulator.WPF.Events;
+using MultiRobotSimulator.WPF.Utils;
 using Stylet;
 
 namespace MultiRobotSimulator.WPF.Pages
@@ -139,13 +140,13 @@ namespace MultiRobotSimulator.WPF.Pages
                 drawingContext.DrawLine(gridPen, new Point(0, i), new Point(width, i));
             }
 
-            RenderTiles(drawingContext);
-            RenderGraph(drawingContext);
-
             if (_rootVM?.RenderPaths ?? false)
             {
                 RenderPaths(drawingContext);
             }
+
+            RenderTiles(drawingContext);
+            RenderGraph(drawingContext);
 
             // pop back guidelines set
             drawingContext.Pop();
@@ -181,10 +182,12 @@ namespace MultiRobotSimulator.WPF.Pages
                 return;
             }
 
-            var pen = new Pen(Brushes.Blue, 1);
-            foreach (var path in paths)
+            for (var p = 0; p < paths.Count; p++)
             {
+                var path = paths.ElementAt(p);
                 if (path.Count == 0) continue;
+
+                var pen = new Pen(DistinctColors.GetBrush(p), 1);
 
                 var source = path.First();
 
