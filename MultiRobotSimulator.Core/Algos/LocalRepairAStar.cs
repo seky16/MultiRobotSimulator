@@ -94,6 +94,7 @@ namespace MultiRobotSimulator.Core.Algos
                     return;
                 }
 
+                var tempG = gScore.GetValueOrDefault(current, double.PositiveInfinity) + 1; // TODO add agitation noise (see Silver)
                 foreach (var neighbor in graph.AdjacentVertices(current))
                 {
                     if (closed.Contains(neighbor))
@@ -101,13 +102,12 @@ namespace MultiRobotSimulator.Core.Algos
                         continue;
                     }
 
-                    var tentative_gScore = gScore.GetValueOrDefault(current, double.PositiveInfinity) + Helpers.Metrics.Octile(current, neighbor); // TODO add agitation noise (see Silver)
-                    if (tentative_gScore < gScore.GetValueOrDefault(neighbor, double.PositiveInfinity))
+                    if (tempG < gScore.GetValueOrDefault(neighbor, double.PositiveInfinity))
                     {
                         cameFrom[neighbor] = current;
-                        gScore[neighbor] = tentative_gScore;
+                        gScore[neighbor] = tempG;
 
-                        var fScore = tentative_gScore + Helpers.Metrics.Octile(neighbor, Target);
+                        var fScore = tempG + Helpers.Metrics.Octile(neighbor, Target);
                         if (!open.TryUpdatePriority(neighbor, fScore))
                         {
                             open.Enqueue(neighbor, fScore);

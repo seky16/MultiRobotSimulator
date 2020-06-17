@@ -83,20 +83,20 @@ namespace MultiRobotSimulator.Core.Algos
                     return true;
                 }
 
+                var tempG = _gScore.GetValueOrDefault(p, double.PositiveInfinity) + 1;
                 foreach (var q in _graph.AdjacentVertices(p).Reverse())
                 {
-                    var gScore = _gScore.GetValueOrDefault(p, double.PositiveInfinity) + Metrics.Octile(p, q);
-                    var fScore = gScore + Metrics.Octile(q, _start);
+                    var tempF = tempG + Metrics.Octile(q, _start);
 
                     if (!_open.Contains(q) && !_closed.Contains(q))
                     {
                         _open.Enqueue(q, double.PositiveInfinity);
                     }
 
-                    if (_open.Contains(q) && fScore < _open.GetPriority(q))
+                    if (_open.Contains(q) && tempF < _open.GetPriority(q))
                     {
-                        _gScore[q] = gScore;
-                        _open.UpdatePriority(q, fScore);
+                        _gScore[q] = tempG;
+                        _open.UpdatePriority(q, tempF);
                     }
                 }
             }
