@@ -1,8 +1,8 @@
 \documentclass[a4paper,twoside,12pt]{report}% dvoustranný tisk
 %\documentclass[12pt]{report}% jednostranný tisk
 % všechny soubory jsou v utf-8
-	\usepackage{ucs}% pro kódování UTF-8
-	%\PrerenderUnicode{ěščřžýáíéĚŠČŘŽÝÁÍÉďťňĎŤŇůúÚóÓ} % předkreslení diakritiky, možno přidat/ubrat znaky podle potřeby
+\usepackage{ucs}% pro kódování UTF-8
+%\PrerenderUnicode{ěščřžýáíéĚŠČŘŽÝÁÍÉďťňĎŤŇůúÚóÓ} % předkreslení diakritiky, možno přidat/ubrat znaky podle potřeby
 							                  
 
 \usepackage[czech]{babel}% čeština
@@ -144,6 +144,12 @@
 %\usepackage{encxvlna}
 
 \usepackage{setspace}
+
+\usepackage{subcaption}
+
+% https://tex.stackexchange.com/a/28334
+\usepackage{chngcntr}
+\counterwithout{figure}{chapter}
 
 \begin{document}
 \setstretch{1.2}

@@ -71,7 +71,7 @@ Nutnou podmínkou pro fungování autonomního robota je jeho navigace, která s
 	\item Mapování -- uložení dat získaných ze senzorů robota při prozkoumávání prostředí do dané reprezentace. Dává odpověď na otázku "Jak vypadá okolní svět?".
 	\item Plánování cesty -- Proces nalezení posloupnosti akcí, které vedou k dosažení daného cíle. Jedná se o otázku "Jak se dostanu do cílové pozice?".
 \end{enumerate}
-Lokalizace a mapování jsou navzájem provázané -- při lokalizaci robota v prostředí je nutné znát jeho reprezentaci a pro správné mapování je nutné znát současnou polohu, ze které byly daná data získána. Plánování cesty je s těmito procesy úzce spjato, jelikož hledáme cestu v závislosti na současné poloze a reprezentaci prostředí. [Meyer, Cyrill, Introduction]
+Lokalizace a mapování jsou navzájem provázané -- při lokalizaci robota v prostředí je nutné znát jeho reprezentaci a pro správné mapování je nutné znát současnou polohu, ze které byla daná data získána. Plánování cesty je s těmito procesy úzce spjato, jelikož hledáme cestu v závislosti na současné poloze a reprezentaci prostředí. [Meyer, Cyrill, Introduction]
 
 \section{Formulace problému plánování cesty}
 \subsection{Stavový prostor}
@@ -94,7 +94,7 @@ Prostředí, ve kterém se robot pohybuje nazveme \emph{pracovní prostor} $W$. 
 \subsection{Konfigurační prostor}
 Plánování cesty přímo v pracovním prostoru je z hlediska časové náročnosti velice neefektivní, jelikož stavový prostor je široký. Přináší také veliké problémy při zohlednění stupňů volnosti, různých tvarů a dalších mechanických omezení robota, které jsou pro různé aplikace odlišné. Pro zobecnění se používá tzv. \emph{konfigurační prostor} $C$.
 
-V konfiguračním prostoru je robot reprezentován jako bod. \emph{Konfigurací} $q$ se myslí kompletní popis polohy a natočení robota v pracovním prostoru $W$. Konfigurační prostor $C$ je tedy množinou všech konfigurací $q$. Překážky $O$ vymezují \emph{kolizní konfigurační prostor} $C_obs$ tj. ty konfigurace, ve kterých by byl robot v kolizi s překážkou. Tzv. \emph{volný konfigurační prostor} je potom množinou všech přípustných konfigurací $C_{free}=C \setminus C_{obs}$. Nalezení \emph{přípustné cesty} je potom zobrazení
+V konfiguračním prostoru je robot reprezentován jako bod. \emph{Konfigurací} $q$ se myslí kompletní popis polohy a natočení robota v pracovním prostoru $W$. Konfigurační prostor $C$ je tedy množinou všech konfigurací $q$. Překážky $O$ vymezují \emph{kolizní konfigurační prostor} $C_{obs}$ tj. ty konfigurace, ve kterých by byl robot v kolizi s překážkou. Tzv. \emph{volný konfigurační prostor} je potom množinou všech přípustných konfigurací $C_{free}=C \setminus C_{obs}$. Nalezení \emph{přípustné cesty} je potom zobrazení
 \begin{equation}
 p: \left[0;L\right]\to C_{free},
 \end{equation}
@@ -104,7 +104,7 @@ kde $L$ je délka cesty $p$. [Introduction,10.1.1.160.1972]
 
 Problém plánování cesty lze tedy pomocí konfiguračního prostoru transformovat na problém hledání cesty ve stavovém přechodovém grafu. Uzly grafu jsou přípustné konfigurace $c\in C_{free}$. Každá hrana (tj. akce, přechod mezi danými konfiguracemi) má danou cenu. [hsplanguide]
 
-Je důležité brát v potaz účel daného robota, jelikož různé aplikace mohou mít různé požadavky. Ve většině případů se jedná o optimalizaci uražené vzdálenosti (tj. hledání nejkratší cesty). Dále je nutné dbát na účinnost, přesnost a bezpečnost robota i ostatních členů prostředí. Hledáme tedy ideálně cestu, při které se vyhneme kolizi s překážkami a dostaneme se do cíle v co nejkratším čase a za použití co nejméně energie. [Introduction]
+Je důležité brát v potaz účel daného robota, jelikož různé aplikace mohou mít různé požadavky. Ve většině případů se jedná o optimalizaci ujeté vzdálenosti (tj. hledání nejkratší cesty). Dále je nutné dbát na účinnost, přesnost a bezpečnost robota i ostatních členů prostředí. Hledáme tedy ideálně cestu, při které se vyhneme kolizi s překážkami a dostaneme se do cíle v co nejkratším čase a za použití co nejméně energie. [Introduction]
 
 %Cílem plánování cesty je nalézt cestu z dané startovací pozice do cíle a při tom se vyhnout kolizi s překážkami. Zároveň je cílem optimalizovat nějakou kriteriální funkci, většinou uraženou vzdálenost, čas strávený cestou nebo co nejnižší energetický výdaj. [07342773;05585236;Liang15] 
 
@@ -117,21 +117,21 @@ Případy využití několika robotů současně jsou stále častější. Jedn�
 Využití několika robotů může mít oproti použití pouze jednoho robota několik potenciálních výhod:
 \begin{itemize}
 	\item Prostorové rozložení -- vykonání úkonů v rozlehlých pracovních prostorech, které přesahují možnosti jednoho robota. Např. odpálení rakety otočením dvou klíčů současně.
-	\item Celkový výkon systému -- systém několika robotů může lépe optimalizovat cenovou funkci jako např. čas potřebný k vykonání úkolu nebo celková energie spotřebovaná roboty.
+	\item Celkový výkon systému -- systém několika robotů může lépe optimalizovat cenovou funkci jako např. čas potřebný k vykonání úkolu nebo celkovou energii spotřebovanou roboty.
 	\item Sdílení informací -- např. více robotů je lépe schopno se lokalizovat navzájem, pokud si vyměňují informace.
-	\item Cena -- použití několika jednoduchých (levnějších) robotů, kteří jsou lehčí naprogramovat, může být levnější než použití jednoho komplexního (drahého) robota.
+	\item Cena -- použití několika jednoduchých (levnějších) robotů, které lze snadněji naprogramovat, může být levnější než použití jednoho komplexního (drahého) robota.
 	\item Spolehlivost, flexibilita -- při selhání jednoho robota jej může nahradit další.
 \end{itemize}
 [57313;dudek1996]
 
 
-Plánování cesty pro více robotů lze rozdělit do několika skupin podle různých kriterií:
+Úlohy plánování cesty pro více robotů lze rozdělit do několika skupin podle různých kriterií:
 \begin{enumerate}
-	\item Podle úplnosti
-	\begin{enumerate}
-		\item \emph{Úplné} -- vždy naleznou cestu (pokud existuje) nebo ověří, že neexistuje. Časová náročnost těchto algoritmů však roste exponenciálně s počtem robotů.
-		\item \emph{Heuristické} -- nemusí nalézt žádnou cestu, i když existuje.
-	\end{enumerate}
+	%\item Podle úplnosti
+	%\begin{enumerate}
+		%\item \emph{Úplné} -- vždy naleznou cestu (pokud existuje) nebo ověří, že neexistuje. Časová náročnost těchto algoritmů však roste exponenciálně s počtem robotů.
+		%\item \emph{Heuristické} -- nemusí nalézt žádnou cestu, i když existuje.
+	%\end{enumerate}
 	\item Podle typů jednotlivých robotů
 	\begin{enumerate}
 		\item \emph{Homogenní} -- schopnosti robotů jsou identické.
@@ -153,7 +153,7 @@ Plánování cesty pro více robotů lze rozdělit do několika skupin podle rů
 		\item \emph{Globální plánování cesty} -- roboti mají úplnou znalost pracovního prostoru před plánováním cesty.
 		\item \emph{Lokální plánování cesty} -- roboti mají neúplnou nebo žádnou znalost okolního prostředí. Musejí tedy v reálném čase snímat pomocí senzorů polohu překážek, vytvářet mapu prostředí a hledat v ní cestu.
 	\end{enumerate}
-	\item Podle ??
+	\item Podle času provádění plánování
 	\begin{enumerate}
 		\item \emph{Offline} -- nejdříve je provedeno plánování cesty pro všechny roboty, poté se roboti podle těchto plánů začnou pohybovat.
 		\item \emph{Online}, příp. \emph{real-time} -- plánování cesty je spojeno s pohybem robotů. Nalezená cesta nemusí být optimální nebo vůbec nalezena, roboti ale netráví dlouhý čas plánováním a dokáží rychle reagovat i na změny prostředí.
@@ -175,17 +175,166 @@ Visibility graph, Voronoi diagram
 
 \chapter{Metody}
 \section{Klasické metody}
-\subsection{A*}
+\subsection{A* Algoritmus}\label{sec:Astar}
+\emph{A* algoritmus} ve svém článku \emph{A formal basis for the heuristic determination of minimum cost paths} představili P. Hart, N. Nilsson a B. Raphael [04082128]. Jeho vstupem je graf, který má ohodnocené hrany (tzv. \emph{ceny přechodu} z jednoho stavu do druhého), startovací a cílový stav. Výstupem je pak nejkratší cesta ze startovací do cílové pozice a nebo informace o tom, že taková cesta neexistuje. 
+
+Algoritmus využívá prioritní frontu (zvanou \emph{OPEN}), ve které jsou jednotlivé stavy určené k expanzi seřazeny dle hodnoty \emph{hodnotící funkce} $f$. Tato funkce má tvar
+\begin{equation}
+	f\left(x\right) = h\left(x\right) + g\left(x\right),
+\end{equation}
+kde $ g\left(x\right)$ je funkce představující vzdálenost mezi počátečním stavem a aktuálním stavem a $h\left(x\right)$ je heuristická funkce, která představuje odhad vzdálenosti od aktuálního stavu do cílového stavu. Tato funkce musí být \emph{přípustná}, což znamená že nesmí nadhodnocovat vzdálenost k cílové pozici. Další vlastností, kterou může mít tato heuristická funkce, je monotónnost. Takovou vlastnost má funkce, pokud splňuje podmínku
+\begin{equation}
+	h\left(x\right)\leq d\left(x,y\right) + h\left(y\right),
+\end{equation}
+kde $d$ je cena přechodu mezi stavem $x$ a $y$. Pokud je tato vlastnost splněna, algoritmus navštíví každý uzel maximálně jednou.
+
+Heuristická funkce může být libovolná, ale pro hledání nejkratší cesty je vhodné opírat se o teorii metrických prostorů. Zde představíme čtyři základní metriky a to \emph{euklidovskou}, \emph{manhattanskou}, \emph{Čebyševovu} a metriku \emph{octile}. 
+
+\begin{itemize}
+	\item \emph{Euklidovská metrika} je dána vztahem 
+	\begin{equation}
+	\rho_e\left(\vec{p},\vec{q}\right)=\sqrt{\sum_{i=1}^n\left(q_i-p_i\right)^2}
+	\end{equation}
+	a představuje jednoduše délku vzdušné spojnice mezi stavem $p$ a $q$, viz obr. \ref{obr:euclid}.
+	
+	\begin{figure}[htb]
+		\begin{center}
+			\includegraphics*[width=15cm,height=6cm,keepaspectratio]{obr/euclid}
+		\end{center}
+		\caption{Euklidovská metrika}
+		\label{obr:euclid}
+	\end{figure}
+	
+	\item \emph{Manhattanská metrika} je inspirovaná pravoúhlým systémem ulic na Manhattanu v New Yorku a je definovaná vztahem
+	\begin{equation}
+	\rho_m\left(\vec{p},\vec{q}\right)=\sum_{i=1}^n\left|q_i-p_i\right|
+	\end{equation}
+	Na obrázku \ref{obr:manhat} je zobrazen příklad manhattanské metriky, kde všechny cesty, ať už červená, modrá nebo žlutá mají stejnou délku. 
+	
+	\begin{figure}[htb]
+		\begin{center}
+			\includegraphics*[width=15cm,height=6cm,keepaspectratio]{obr/manhat}
+		\end{center}
+		\caption{Manhattanská metrika}
+		\label{obr:manhat}
+	\end{figure}
+
+	\item \emph{Čebyševova (maximální) metrika} počítá pouze s nejdelší složkou vzdálenosti, tj. je daná vztahem
+	\begin{equation}
+	\rho_c\left(\vec{p},\vec{q}\right)=\max_{\forall i}\left|q_i-p_i\right|.
+	\end{equation}
+	Obrázek \ref{obr:chebyshev} ukazuje, že všechny sousední buňky mají v Čebyševově metrice vzdálenost 1.
+	
+	\begin{figure}[htb]
+		\begin{center}
+			\includegraphics*[width=15cm,height=6cm,keepaspectratio]{obr/chebyshev}
+		\end{center}
+		\caption{Čebyševova metrika}
+		\label{obr:chebyshev}
+	\end{figure}
+	
+	\item Octile metrika kombinuje pohyb  diagonální a přímý a mezi dvěma stavy (ve 2D mřížce) je definovaná jako
+	\begin{equation} \rho_o\left(\vec{p},\vec{q}\right)=\max\left(\left|p_1-q_1\right|,\left|p_2-q_2\right|\right)+(\sqrt{2}-1)\cdot \min\left(\left|p_1-q_1\right|,\left|p_2-q_2\right|\right).
+	\end{equation}
+	Příklad octile metriky je zobrazen na obrázku \ref{obr:octile}.
+	
+	\begin{figure}[htb]
+		\begin{center}
+			\includegraphics*[width=15cm,height=6cm,keepaspectratio]{obr/octile}
+		\end{center}
+		\caption{Octile metrika}
+		\label{obr:octile}
+	\end{figure}
+	
+\end{itemize} 
+Nyní k samotnému popisu algoritmu. Jak již bylo řečeno na začátku této kapitoly, algoritmus pracuje s prioritní frontou (\emph{OPEN}) nenavštívených uzlů grafu. Uzly jsou seřazeny dle hodnoty funkce $f$ a čím nižší je její hodnota, tím vyšší má uzel prioritu. V každé iteraci je uzel s nejnižší hodnotou funkce $f$ odebrán a jsou spočítány hodnoty $g$  a $f$ jeho sousedních uzlů. V případě, že tyto uzly nejsou v prioritní frontě, tak jsou tam přidány, a pokud již ve frontě jsou, tak aktualizujeme hodnotu funkce $f$, pokud je nižší. Algoritmus pokračuje do té doby, dokud nenalezne koncový uzel nebo dokud nedojde k vyprázdnění fronty \emph{OPEN}. Hodnota $g$ koncového uzlu je pak hodnota nejkratší cesty ze startovacího uzlu do koncového. Tento postup je popsán v algoritmu \ref{alg:Astar}.
+
+%\begin{figure}[htb]
+%	\begin{center}
+%		\includegraphics*[width=15cm,height=6cm,keepaspectratio]{obr/pr1}
+%	\end{center}
+%	\caption{Výchozí stav probému}
+%	\label{pr1}
+%\end{figure}
+%
+%Algoritmus si ukážeme na příkladu z obrázku \ref{pr1}. V prvním kroku je přidán do prioritní fronty startovací uzel, nejedná se o koncový uzel a tak výpočet pokračuje. Pro jeho sousední uzly $ A $ a $ B $ jsou vypočteny hodnoty funkce $ f $. Do prioritní fronty jsou přidány trojice [aktuální uzel, předchůdce, hodnota funkce $ f $]. Uzel $ S $ byl tedy expandován a nyní se odstraní z prioritní fronty do seznamu pro již expandované uzly. Momentálně prioritní fronta tedy obsahuje
+%$$ OPEN = ([B, S, 4], [A, S, 7], [C, S, 11]).  $$
+%V druhém kroku je vybrán uzel s nejmenší hodnotou funkce $ f $, což je v našem případě uzel $ B $. Ten má pouze jednoho následníka a to uzel $ D $. Pro něj je vypočtena hodnota funkce $ f = 8 $, je přidán do seznamu OPEN, ze kterého je odstraněn uzel $ B $, který je přidán do seznamu CLOSE. Prioritní fronta nyní obsahuje
+%$$ OPEN = ([A, S, 7], [D, B, 8], [C, S, 11]).  $$
+%V dalším kroku vybereme uzel $ A $, jehož následník je uzel $ C $, který už sice v prioritní frontě je, ale je potřeba zkontrolovat, jestli nová hodnota funkce $ f $ není menší. Hodnota funkce $ f $ je 12, což je větší jak stará hodnota a proto se nic nemění a jediné, co se děje je to, že je z fronty odebrán uzel $ A $. V další kroku je tedy vybrán uzel $ D $ opět s následníkem $ C $, jehož hodnota funkce $ f $ je nyní 9. Prioritní fronta nyní obsahuje pouze uzel $ C $ 
+%$$ OPEN = ([C, D, 9]). $$
+%Z tohoto uzlu lze pokračovat do uzlů $ A, E, Cíl $ a prioritní fronta vypadá následovně
+%$$ OPEN = ([E, C, 9], [Cíl, C, 12], [A, C, 15]). $$
+%Nyní je expandován uzel $ E $, přičemž lze pokračovat pouze do uzlu $ Cíl $, přičemž ten už v prioritní frontě je a tak je porovnána jeho nova hodnota funkce $ f $ se starou. Ta je kratší a tak prioritní fronta nyní obsahuje
+%$$ OPEN = ([Cíl, E, 10], [A, C, 15]). $$
+%V posledním kroku je vybrán z prioritní fronty uzel $ Cíl $ a jelikož se jedná o koncový uzel, tak je algoritmus u konce. Nejkratší cesta je zobrazena na obrázku \ref{konec}.
+%
+%\begin{figure}[htb]
+%	\begin{center}
+%		\includegraphics*[width=15cm,height=6cm,keepaspectratio]{obr/konec}
+%	\end{center}
+%	\caption{Nejkrátší cesta}
+%	\label{konec}
+%\end{figure}
+
+\begin{algorithm}[H]
+	\caption{A* algoritmus}
+	\label{alg:Astar}
+	\begin{algorithmic}[1]
+		\Function{A*}{$start,goal$}
+		\State $start.g=0$
+		\State $start.f=h(start,goal)$
+		\State $Open=\left\{start\right\}$
+		\Comment{prioritní fronta (podle hodnot $f$)}
+		\State $Closed=\emptyset$
+		\While{$Open\neq\emptyset$}
+		\State $current\gets Open.pop()$
+		\Comment{prvek s nejlepší hodnotou $f$}
+		\State $Closed.add(current)$
+		\If{$current=goal$}
+		\State \textbf{return} \Call{ReconstructPath}{$current$}
+		\EndIf
+		\ForAll{$neighbor \in$ \Call{Neighbors}{$current$}}
+		\If{$neighbor \in Closed$}
+		\State \textbf{continue}
+		\EndIf
+		\State $tempG\gets current.g+$\Call{Cost}{$current,neighbor$}
+		\If{$tempG<neighbor.g$}
+		\State $neighbor.g=tempG$
+		\State $neighbor.f=tempG+h(current,neighbor)$
+		\State $neighbor.parent=current$
+		\If{$neighbor\notin Open$}
+		\State $Open.add(neighbor)$
+		\EndIf
+		\EndIf
+		\EndFor
+		\EndWhile
+		\State \textbf{return} failure
+		\EndFunction
+		\Statex
+		\Function{ReconstructPath}{$current$}
+		\State $path\gets\left\{current\right\}$
+		\While{$\exists current.parent$}
+		\State $current\gets current.parent$
+		\State $path.prepend(current)$
+		\EndWhile
+		\State \textbf{return} $path$
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
 \subsection{Local Repair A*}
 Zatímco použití běžného A* algoritmu je při hledání cesty pro jednoho robota plně dostačující, při pohybu více robotů ve stejný čas může tento přístup lehce selhat a dojít ke srážce mezi roboty. Běžný postup, používaný například i ve videohrách, je využití takzvaného \emph{Local Repair A*} (LRA*) algoritmu.
 
-Local Repair A* nejprve vyhledá pro každého robota nejkratší cestu pomocí klasického A* algoritmu (viz výše), nezávisle na ostatních. Bere v potaz pouze sousedy, kteří jsou v sousedních buňkách startovací pozice. Po vyhledání jednotlivých cest se po nich roboti začnou pohybovat. Při pohybu vždy robot kontroluje následující pozici, do které se má přesunout, a pokud by hrozila kolize, protože je na této pozici již jiný robot, označí tuto pozici jako překážku a přepočítá zbytek cesty do cíle s touto novou informací.
+Local Repair A* nejprve vyhledá pro každého robota nejkratší cestu pomocí klasického A* algoritmu (viz podkapitola \ref{sec:Astar}), nezávisle na ostatních. Bere v potaz pouze sousedy, kteří jsou v sousedních buňkách startovací pozice. Po vyhledání jednotlivých cest se po nich roboti začnou pohybovat. Při pohybu vždy robot kontroluje následující pozici, do které se má přesunout, a pokud by hrozila kolize, protože je na této pozici již jiný robot, označí tuto pozici jako překážku a přepočítá zbytek cesty do cíle s touto novou informací.
 
 % TODO obrázek ?
 
-Je možné (a velice časté), že dojde k zacyklení jednoho nebo více robotů. Jedno z řešení tohoto problému, je při každém přeplánování trasy zvýšit tzv. \emph{úroveň agitace}. Při hledání je potom přidán náhodný šum úměrný úrovni agitace k hodnotě heuristické funkce $h$. Zvýšením náhodnosti chování robotů při plánování nové cesty se předpokládá, že uniknou z problematického místa, protože si vyberou jinou cestu.
+Je možné (a velice časté), že dojde k zacyklení jednoho nebo více robotů. Jedno z řešení tohoto problému je zvýšení tzv. \emph{úrovně agitace} při každém přeplánování trasy. Při hledání je potom přidán náhodný šum úměrný úrovni agitace k hodnotě heuristické funkce $h$. Zvýšením náhodnosti chování robotů při plánování nové cesty se předpokládá, že uniknou z problematického místa, protože si vyberou jinou cestu.
 
 Algoritmus Local Repair A* má několik nevýhod. Obzvláště v úzkých koridorech je velká pravděpodobnost ke vzniku zácpy, která může trvat dlouhou dobu, případně se ji nepodaří vyřešit vůbec. Roboti v zácpě neustále znovu plánují svoje cesty a tím dochází k opakovanému spouštění celého A* algoritmu. Toto vede k nepříznivému, \uv{neinteligentnímu} chování, případně k úplnému selhání hledání cesty.
+
+Výhodou tohoto algoritmu je však jeho jednoduchost. V otevřených prostorech nebo problémech s málo roboty, kde nehrozí k častým kolizím, je jeho časová náročnost srovnatelná s klasickým A* algoritmem.
 
 % TODO pseudokód? 
 
@@ -201,9 +350,9 @@ A* algoritmus nalezne cestu s nejnižší cenovou funkcí, tj. nejrychlejší ce
 Pro zohlednění pohybu robotů se využívá tzv. \emph{rezervační tabulka}. Po té, co každý robot naplánuje svoji cestu, je každý stav této cesty zaznamenán do rezervační tabulky. Každý stav zanesený do této tabulky je při plánování dalšími roboty považován za překážku v na dané pozici v daném čase. 
 
 % TODO předělat obrázek
-\begin{figure}[!h]
+\begin{figure}[htb]
 	\begin{center}
-		\includegraphics*[scale=0.5]{obr/reservationTable}
+		\includegraphics*[width=15cm,height=6cm,keepaspectratio]{obr/reservationTable}
 	\end{center}
 	\caption[caption]{Rezervační tabulka [coop-path-AIWisdom]}
 	\label{obr:reservationTable}
@@ -219,9 +368,9 @@ Jednou z nevýhod Cooperative A* algoritmu, je již zmíněná přidaná dimenze
 Další z nevýhod je, že Cooperative A* (stejně jako žádný jiný distribuovaný hladový algoritmus) nedokáže vyřešit určité typy problémů, kdy řešení jednoho robota zamezí v možnosti dalšího robota nalézt přípustnou cestu. Jeden příklad tohoto problému můžeme vidět na obrázku \ref{obr:unsolvableCoopProblem}. První robot při naplánování cesty z výchozí pozice $S_1$ do cíle $G_1$ zamezí v cestě druhému robotu, který se snaží naplánovat cestu z pozice $S_2$ do cíle $G_2$.
 
 % TODO předělat obrázek
-\begin{figure}[!h]
+\begin{figure}[htb]
 	\begin{center}
-		\includegraphics*[scale=0.5]{obr/unsolvableCoopProblem}
+		\includegraphics*[width=15cm,height=6cm,keepaspectratio]{obr/unsolvableCoopProblem}
 	\end{center}
 	\caption[caption]{Příklad problému, který nelze vyřešit pomocí Cooperative A* [Silver05]}
 	\label{obr:unsolvableCoopProblem}
@@ -230,14 +379,15 @@ Další z nevýhod je, že Cooperative A* (stejně jako žádný jiný distribuo
 Pro Cooperative A* lze použít libovolnou přípustnou heuristickou funkci. Při využití mřížkových map se nejčastěji používá Manhattanská metrika. Při použití na složitých mapách, kde dochází k plánování cyklických cest, je ovšem tato metrika nedostatečná.
 
 % TODO předělat obrázek, rozdělit do dvou?
-\begin{figure}[!h]
+\begin{figure}[htb]
 	\begin{center}
-		\includegraphics*[scale=0.5]{obr/coopManh}
+		\includegraphics*[width=15cm,height=6cm,keepaspectratio]{obr/coopManh}
 	\end{center}
 	\caption[caption]{Použití Manhattanské metriky v Cooperative A* [coop-path-AIWisdom]}
 	\label{obr:coopManh}
 \end{figure}
 
+% TODO "lépe vysvětlit"
 Na obrázku \ref{obr:coopManh} vlevo vidíme hodnoty $f$ buněk, které při plánování prohledá A* algoritmus. Vidíme, že algoritmus prohledal skoro všechny buňky, i ty co reálně nevedou k cíli. Při použití Cooperative A*, tedy plánování v prostoru rozšířeném o jednu dimenzi, vidíme na obrázku \ref{obr:coopManh} vpravo, že tento algoritmus prohledává dané buňky několikrát, vždy v různých časech. Algoritmus se snaží vrátit zpět a prohledat buňky s lepší hodnotou $f$ v dalších časech a tím se několikanásobně zhoršuje časová náročnost tohoto algoritmu.
 
 \subsection{Hierarchical Cooperative A*}
@@ -248,11 +398,11 @@ Na obrázku \ref{obr:coopManh} vlevo vidíme hodnoty $f$ buněk, které při pl�
 Heuristickou funkci lze zlepšit pomocí abstrakce stavového prostoru.  Jako odhad vzdálenosti z dané buňky do cíle použijeme nejkratší možnou vzdálenost bez závislosti na čase a ostatních robotech. Jedná se tedy o délku cesty nalezenou A* algoritmem na 2D mřížce. Tuto vzdálenost nazveme \emph{pravá vzdálenost}.
 
 % TODO předělat obrázek
-\begin{figure}[!h]
+\begin{figure}[htb]
 	\begin{center}
-		\includegraphics*[scale=0.5]{obr/hierarchCoopMetric}
+		\includegraphics*[width=15cm,height=6cm,keepaspectratio]{obr/hierarchCoopMetric}
 	\end{center}
-	\caption[caption]{Použití pravé vzdálenosti [coop-path-AIWisdom]}
+	\caption[caption]{Použití pravé vzdálenosti (počet expanzí buněk) [coop-path-AIWisdom]}
 	\label{obr:hierarchCoopMetric}
 \end{figure}
 
@@ -261,13 +411,13 @@ Na obrázku \ref{obr:hierarchCoopMetric} vidíme, že při použití pravé vzd�
 Pravou vzdálenost je potřebné spočítat pro každou buňku, kterou Cooperative A* prohledá. Pokud bychom pokaždé hledali cestu z dané buňky do cíle pomocí klasického A* algoritmu, bylo by celkové plánování cesty ještě pomalejší, než použití horší heuristické funkce. Jednou z možností je spočítat všechny abstraktní vzdálenosti dopředu, ale z důvodu, že se jedná o dynamický problém a tyto vzdálenosti bychom museli počítat pro každého robota, není toto řešení adekvátní. Další možností je využití \emph{Hierarchical A*}, který počítá abstraktní vzdálenosti na požádání.
 
 \subsubsection{Reverse Resumable A*}
-Jednou z vlastností A* algoritmu je, že pokud využíváme konzistentní heuristickou funkci, tak při prohledávání dané buňky (při vložení do seznamu \emph{closed}) známe nejkratší cestu z výchozí pozice do této buňky $g$.
+Jednou z vlastností A* algoritmu je, že pokud využíváme monotónní heuristickou funkci, tak při prohledávání dané buňky (při vložení do seznamu \emph{closed}) známe nejkratší cestu z výchozí pozice do této buňky $g$.
 
 Této vlastnosti můžeme využít a hledat cestu "pozpátku". Začneme-li v cílové pozici, tak po dokončení prohledávání (jakmile dojdeme do počáteční pozice) vidíme (jak ukazuje obrázek \ref{obr:backwardsSearch}), že hodnoty $g$ pro každou prohledanou buňku obsahují reálnou nejkratší vzdálenost do cíle.
 
-\begin{figure}[!h]
+\begin{figure}[htb]
 	\begin{center}
-		\includegraphics*[scale=0.5]{obr/backwardsSearch}
+		\includegraphics*[width=15cm,height=6cm,keepaspectratio]{obr/backwardsSearch}
 	\end{center}
 	\caption[caption]{Příklad zpětného prohledávání [coop-path-AIWisdom]}
 	\label{obr:backwardsSearch}
@@ -275,17 +425,18 @@ Této vlastnosti můžeme využít a hledat cestu "pozpátku". Začneme-li v cí
 
 Po nalezení cesty pomocí zpětného prohledávání nemusíme mít expandované všechny potřebné buňky a tedy jejich $g$ hodnoty. Naštěstí můžeme v prohledávání znovu pokračovat, dokud nenarazíme na danou buňku. Tento postup nazveme \emph{Reverse Resumable A*}, jehož pseudokód je popsán v algoritmu \ref{alg:RRA}.
 \\
-\\
+\\ % TODO "Tento popis neodpovídá originálu."
 Cooperative A*, který jako heuristickou funkci používá pravou vzdálenost nazveme \emph{Hierarchical Cooperative A*}. Plánování cesty tedy probíhá tak, jak je popsáno v podkapitole \ref{sec:Coop}. Pro odhad vzdálenosti voláme metodu \texttt{AbstractDict}, která ověří, jestli je daná buňka expandovaná. Pokud ano, vrátíme její $g$ hodnotu. Pokud není, pokračujeme v hledání pomocí Reverse Resumable A* algoritmu, dokud neexpandujeme požadovanou buňku a nezískáme tak její $g$ hodnotu.
 
 \begin{algorithm}[H]
 	\caption{Reverse Resumable A*}
 	\label{alg:RRA}
 	\begin{algorithmic}[1]
-		\Function{InitialiseRRA*}{$S,G$}
+		\Function{InitialiseRRA*}{$O,G$}
 			\State $G.g\gets 0$
-			\State $G.h\gets$ \Call{Heuristic}{$G,O$}
+			\State $G.h\gets h(G,O)$
 			\State $Open\gets\left\{ G \right\}$
+			\Comment{prioritní fronta (podle hodnot $f$)}
 			\State $Closed\gets\emptyset$
 			\State \Call{ResumeRRA*}{$O$}
 		\EndFunction
@@ -293,15 +444,16 @@ Cooperative A*, který jako heuristickou funkci používá pravou vzdálenost na
 		\Function{ResumeRRA*}{$N$}
 			\While{$Open\neq\emptyset$}
 				\State $P\gets Open.pop()$
+				\Comment{prvek s nejlepší hodnotou $f$}
 				\State $Closed.add(P)$
 				\If{$P=N$}
 					\State \textbf{return} success
 				\EndIf
 				\ForAll{$Q\in$ \Call{Neighbors}{$P$}.$reverse()$}
 					\State $tempG\gets P.g+$ \Call{Cost}{P,Q}
-					\State $tempH\gets$ \Call{Heuristic}{$G,O$}
+					\State $tempH\gets h(G,O)$
 					\If{$Q\notin Open$ \textbf{and} $Q\notin Closed$}
-						\State $Open.add(Q)$ with $f=\infty$
+						\State $Open.add(Q)$
 					\EndIf
 					\If{$Q\in Open$ \textbf{and} $(tempG+tempH)<Q.f$}
 						\State $Q.g=tempG$
@@ -327,13 +479,165 @@ Cooperative A*, který jako heuristickou funkci používá pravou vzdálenost na
 \section{Heuristické metody}
 Probabilistic Roadmaps, Rapidly-exploring Random Trees, Neural Networks, Genetic Algs, Simulated Annealing, ACO, PSO, Fuzzy
 
-\chapter{Implementace vybraných algoritmů}
-\section{Aplikace}
-\subsection{GUI}
-\subsection{Plug-in systém}
-\subsection{MovingAI benchmarks}
-\subsection{Implementované algoritmy}
-LRA*, CA*, HCA*
+%\chapter{Implementace vybraných algoritmů}
+%\section{Aplikace}
+%\subsection{GUI}
+%\subsection{Plug-in systém}
+%\subsection{MovingAI benchmarks}
+%\subsection{Implementované algoritmy}
+%LRA*, CA*, HCA*
+
+\chapter{Popis aplikace}
+Následující kapitola se bude věnovat popisu aplikace \emph{MultiRobotSimulator}, který je výstupem praktické části této diplomové práce. Jedná se o grafické prostředí umožnující vytvářet, importovat a editovat mapy prostředí, spouštět a vyhodnocovat výsledky daných algoritmů a pomocí plug-in systému jednoduše implementovat další algoritmy pro plánování cesty více robotů.
+
+\section{Použité technologie}
+\subsubsection{C\texttt{\#}}
+C\texttt{\#} (vysl. \emph{see sharp}) je moderní mnohoúčelový vysokoúrovňový objektově orientovaný programovací jazyk vyvíjený od roku 2000 firmou Microsoft zároveň s platformou \emph{.NET Framework}. Nabízí podporu pro principy softwarového inženýrství, jakými jsou např. silné typování, hlídání hranic polí, detekce použití neinicializovaných proměnných nebo automatický garbage collector. Je vhodný pro vývoj softwarových komponent vhodných pro distribuované prostředí, jak pro velká zařízení se sofistikovanými operačními systémy, tak pro malá zařízení s omezenými funkcemi. Tento programovací jazyk byl schválen normalizační organizací ECMA. [ECMA-334] Konkrétně se jedná o multiplatformní open-source platformu \emph{.NET Core} verze 3.0. K vývoji bylo použito vývojové prostředí \emph{Visual Studio 2019}, podporující např. IntelliSense, refaktorování kódu, statickou analýzu nebo editor grafických rozhraní. [MS Docs]
+
+\subsubsection{Windows Presentation Foundation}
+Pro design grafického uživatelského rozhraní (GUI) byla zvolena technologie \emph{Windows Presentation Foundation} (WPF), která je součástí .NET Framework. Jedná se o moderního nástupce sady knihoven \emph{Windows Forms}. Základem je renderovací engine založený na vektorové grafice využívající moderních zobrazovacích zařízení, podporující hardwarovou akceleraci a technologii \emph{DirectX}. Pomocí datových vazeb umožňuje jednoduše oddělit vzhled od funkční logiky programu. [MS Docs]
+
+\subsubsection{Stylet}
+Pro zjednodušení práce s architekturou Model-View-ViewModel, která je základem WPF, byla zvolena knihovna \emph{Stylet} [Stylet], která umožňuje jednoduchou údržbu a testovatelnost kódu. Navíc obsahuje poskytovatele závislostí, tzv. IoC kontejner, jehož bylo využito při implementaci plug-in systému (podkapitola \ref{sec:plugins}).
+
+\subsubsection{QuickGraph}
+Pro reprezentaci prostředí jako grafu byla použita knihovna \emph{QuickGraph} [QuickGraph], která obsahuje generické datové struktury reprezentující neorientované a orientované grafy i některé algoritmy použitelné s těmito strukturami.
+
+\subsubsection{High Speed Priority Queue}
+Jelikož A* algoritmus využívá prioritní frontu \emph{OPEN}, bylo použito knihovny \emph{High Speed Priority Queue} [HSPQ], která je implementovaná speciálně pro plánování cest. Tato knihovna nabízí testovanou, rychlou, generickou prioritní frontu bez závislostí na jiné knihovny.
+
+\section{Uživatelské rozhraní}
+Cílem uživatelského rozhraní je umožnit uživatelům snadné a intuitivní používání programu. Na obrázku \ref{obr:gui} můžeme vidět hlavní okno aplikace a její popsané části.
+
+\begin{figure}[htb]
+	\begin{center}
+		\includegraphics*[width=\textwidth,keepaspectratio]{obr/gui}
+	\end{center}
+	\caption[caption]{Hlavní okno aplikace}
+	\label{obr:gui}
+\end{figure}
+
+\subsubsection{1 -- Hlavní menu}
+Hlavní menu (viz obrázek \ref{obr:menu}) umožnuje uživateli vytvořit novou mapu, případně ji načíst ze souboru (formát popsán v podkapitole \ref{sec:movingAI}) nebo uložit. Při výběru možnosti vytvoření nové mapy se otevře dialog s nabídkou specifikovat požadovanou výšku a šířku (obrázek \ref{obr:newMapDialog}). Otevírání a ukládání map je zprostředkováno standardním dialogovým oknem operačního systému.
+
+% https://tex.stackexchange.com/a/37597
+\begin{figure}[htb]
+	\centering
+	\begin{minipage}{.5\textwidth}
+		\centering
+		\includegraphics[height=4cm,keepaspectratio]{obr/menu}
+		\vspace*{4mm}
+		\caption{Hlavní menu}
+		\label{obr:menu}
+	\end{minipage}%
+	\begin{minipage}{.5\textwidth}
+		\centering
+		\includegraphics[height=4cm]{obr/newMapDialog}
+		\vspace*{4mm}
+		\caption{Dialog pro vytvoření nové mapy}
+		\label{obr:newMapDialog}
+	\end{minipage}
+\end{figure}
+
+\subsubsection{2 -- Záložky}
+Aplikace umožňuje mít otevřeno několik map zároveň a přepínat mezi nimi pomocí záložek. Všechny funkce aplikace probíhají na aktuálně zvolené mapě.
+
+\subsubsection{3 -- Mapa prostředí}
+Prostředí je v aplikaci představováno sítí čtverců, kde bílé čtverce představují přípustné stavy a černé čtverce reprezentují překážky (nepřípustné stavy). Výchozí stavy robotů jsou zobrazeny jako zelené kruhy a cílové stavy jako kruhy červené. Stavy se stejnými čísly přísluší stejnému robotu. Stavy lze přidávat kliknutím levým tlačítkem myši v závislosti na vybraném módu na postranním panelu (4), pravým tlačítkem daný stav smažeme.
+
+\subsubsection{4 -- Postranní panel}
+Postranní panel obsahuje dvě záložky:
+\begin{itemize}
+	\item Editor (obrázek \ref{obr:sideEditor}) -- Obsahuje možnosti týkající se editoru mapy prostředí. Tlačítko \emph{Clear all} smaže z mapy všechny překážky a výchozí a cílové stavy robotů. Tlačítko \emph{Clear robots} smaže pouze výchozí a cílové stavy, překážky ponechá. Přepínačem \emph{Draw} je možné vybrat mód kreslení do mapy. Možnost \emph{Render graph} zobrazí v mapě hrany grafu, který reprezentuje toto prostředí. Toto zobrazení můžeme vidět na obrázku \ref{obr:renderGraph}
+	\begin{figure}[htb]
+		\begin{center}
+			\includegraphics*[height=4cm,keepaspectratio]{obr/sideEditor}
+		\end{center}
+		\caption{Postranní panel -- záložka Editor}
+		\label{obr:sideEditor}
+	\end{figure}
+
+\begin{figure}[htb]
+\begin{center}
+	\includegraphics*[height=10cm,keepaspectratio]{obr/renderGraph}
+\end{center}
+\caption{Zobrazení grafu v mapě (fialová)}
+\label{obr:renderGraph}
+\end{figure}
+	
+	\item Search (obrázek \ref{obr:sideSearch}) -- V této záložce si může uživatel vybrat ve výběrovníku požadovaný algoritmus. Tlačítkem \emph{Run search} se spustí hledání pomocí vybraného algoritmu. Po dokončení hledání se pod tímto tlačítkem zobrazí výsledky s těmito informacemi: počet úspěšně nalezených cest, čas inicializace algoritmu, čas potřebný k hledání a délka nejkratší cesty.
+	\begin{figure}[htb]
+		\begin{center}
+			\includegraphics*[height=4cm,keepaspectratio]{obr/sideSearch}
+		\end{center}
+		\caption{Postranní panel -- záložka Search}
+		\label{obr:sideSearch}
+	\end{figure}
+\end{itemize}
+
+Po dokončení hledání jsou v mapě zobrazeny nalezené cesty, odlišené barevně pro lepší přehlednost. Příklad můžeme vidět na obrázku~\ref{obr:foundPaths}.
+
+\begin{figure}[htb]
+	\begin{center}
+		\includegraphics*[height=10cm,keepaspectratio]{obr/foundPaths}
+	\end{center}
+	\caption{Zobrazení nalezených cest}
+	\label{obr:foundPaths}
+\end{figure}
+
+\section{Plug-in systém}\label{sec:plugins}
+Aplikace podporuje programování plánovacích algoritmů nezávisle na ostatních funkcích programu. Tohoto je dosaženo pomocí vrstvy abstrakce, jejíž schéma můžeme vidět na obrázku \ref{obr:pluginsSchema}. Uživatel ovládá aplikaci pomocí grafického rozhraní, které je obsaženo v projektu \texttt{WPF}. Programová logika je obsažena v projektu \texttt{Core}, která pomocí veřejných rozhraní (angl. interface) a abstraktních tříd provádí plánování cest robotů.
+
+\begin{figure}[htb]
+	\begin{center}
+		\includegraphics*[width=15cm,keepaspectratio]{obr/pluginsSchema}
+	\end{center}
+	\caption{Schéma architektury }
+	\label{obr:pluginsSchema}
+\end{figure}
+
+Uživatel může naprogramovat vlastní algoritmus v jazyce C\texttt{\#}, který aplikace při startu naimportuje a je možné jej použít stejně jako zabudované algoritmy. Pro implementaci algoritmu je nutné vytvořit třídu, která dědí z abstraktní třídy \texttt{AbstractAlgo}, případně rozhraní \texttt{IAlgo}. Vlastnosti a funkce této třídy jsou následující:
+\begin{itemize}
+	\item \texttt{Graph} -- graf reprezentující danou mapu prostředí
+	%\item \texttt{Logger} -- rozhraní umožňující zápis informací o běhu algoritmu
+	\item \texttt{Name} -- název algoritmu
+	\item \texttt{Robots} -- seznam robotů s danými vlastnostmi (start, cíl, nalezená cesta atd.)
+	\item \texttt{Initialize()} -- funkce volaná na začátku hledání
+	\item \texttt{RobotFactory(start, target)} -- funkce vytvářející instanci robota, umožňující její rozšíření uživatelem
+	\item \texttt{RunSearch()} -- funkce obsahující vlastní implementaci plánovacího algoritmu
+\end{itemize}
+
+Sestavenou knihovnu \texttt{.dll} musí uživatel před spuštěním aplikace umístit do složky \texttt{plugins}, ve které se nachází i textový soubor \texttt{readme.md} s bližšími informacemi jak postupovat při implementaci.
+
+
+
+
+\section{MovingAI benchmarks}\label{sec:movingAI}
+Aplikace podporuje otevírání a ukládání map ve formátu, který byl zaveden Sturtevantem [Sturtevant] v jeho článku \emph{Benchmarks for Grid-Based Pathfinding}. Jedná se o sadu mřížkových map, která je k dispozici online (https://movingai.com/benchmarks/). Tato sada obsahuje mapy z komerčních počítačových her (např. Baldurs Gate II, Warcraft III a další), mapy z městských prostředí (Berlín, Londýn, ...), mapy bludišť a další náhodně vygenerované mapy. Tyto sady jsou běžně používané ve vědeckých výzkumech pro srovnávání výsledků jednotlivých algoritmů. Příklady těchto map můžeme vidět na obrázku~\ref{obr:mapy}.
+
+% TODO dávkovací režim
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=6cm]{obr/AR0300SR}
+		\vspace*{4mm}
+		\caption{Mapa \texttt{AR0300SR} ze hry Baldurs Gate II}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=6cm]{obr/Boston_0_512}
+		\vspace*{4mm}
+		\caption{Mapa \texttt{Boston\_0\_512}}
+	\end{subfigure}
+\vspace*{4mm}
+	\caption{Příklady map z MovingAI benchmarks [Sturtevant]}
+	\label{obr:mapy}
+\end{figure}
+
+\section{Implementované algoritmy}
+
 
 \chapter{Vyhodnocení výsledků}
 
