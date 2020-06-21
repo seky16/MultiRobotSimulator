@@ -176,7 +176,17 @@ namespace MultiRobotSimulator.Core.Models
             return sb.ToString();
         }
 
-        public AbstractTile? GetTileAtPos(int x, int y) => _tileCache.TryGetValue((x, y), out var tile) ? tile : null;
+        public AbstractTile? GetTileAtPos(int x, int y)
+        {
+            if (_tileCache.TryGetValue((x, y), out var tile))
+            {
+                return tile;
+            }
+
+            tile = _wrappedGraph.Vertices.FirstOrDefault(t => t.X == x && t.Y == y);
+            _tileCache[(x, y)] = tile;
+            return tile;
+        }
 
         public bool RemoveFromTile(Tile tile)
         {
