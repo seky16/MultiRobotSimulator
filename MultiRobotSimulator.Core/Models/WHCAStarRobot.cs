@@ -55,13 +55,13 @@ namespace MultiRobotSimulator.Core.Models
             {
                 return _rra.AbstractDist(pTile);
             }
-            if (p == q && q.Equals(Target))
-            {
-                return 0;
-            }
 
             if (q == p.Next())
             {
+                if (q.Equals(Target))
+                {
+                    return 0;
+                }
                 return 1;
             }
 
@@ -109,7 +109,7 @@ namespace MultiRobotSimulator.Core.Models
                     continue;
                 }
 
-                if (current.T == _w)
+                if (current.T == _w || current.Equals(Target))
                 {
                     Path.AddRange(ReconstructPath(current));
 

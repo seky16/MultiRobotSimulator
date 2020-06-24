@@ -1,6 +1,5 @@
 ﻿#nullable disable
 
-using System;
 using System.Collections.Generic;
 using MultiRobotSimulator.Abstractions;
 using MultiRobotSimulator.Helpers;
@@ -10,100 +9,100 @@ namespace MultiRobotSimulator.Core.Models
 {
     public class CoopAStarRobot : Robot
     {
-        private readonly Dictionary<AbstractTile, AbstractTile> _cameFrom = new Dictionary<AbstractTile, AbstractTile>();
-        private readonly HashSet<AbstractTile> _closed = new HashSet<AbstractTile>();
-        private readonly Dictionary<AbstractTile, double> _gScore = new Dictionary<AbstractTile, double>();
-        private readonly SimplePriorityQueue<AbstractTile, double> _open = new SimplePriorityQueue<AbstractTile, double>();
-        private readonly Dictionary<AbstractTile, int> _time = new Dictionary<AbstractTile, int>();
-        private readonly Dictionary<AbstractTile, int> _wait = new Dictionary<AbstractTile, int>();
+        private readonly Dictionary<SpaceTimeNode, SpaceTimeNode> _cameFrom = new Dictionary<SpaceTimeNode, SpaceTimeNode>();
+        private readonly HashSet<SpaceTimeNode> _closed = new HashSet<SpaceTimeNode>();
+        private readonly Dictionary<SpaceTimeNode, double> _gScore = new Dictionary<SpaceTimeNode, double>();
+        private readonly SimplePriorityQueue<SpaceTimeNode, double> _open = new SimplePriorityQueue<SpaceTimeNode, double>();
+        private SpaceTimeGraph _graph;
 
         public CoopAStarRobot(AbstractTile start, AbstractTile target) : base(start, target)
         {
         }
 
-        public virtual void Search(IGraph graph, ref HashSet<(int, int, int)> reservationTable, Func<AbstractTile, AbstractTile, double> h)
+        public virtual void Initialize(SpaceTimeGraph spaceTimeGraph)
         {
-            _gScore[Start] = 0;
-            _open.Enqueue(Start, h(Start, Target));
+            _graph = spaceTimeGraph;
+        }
 
-            AbstractTile current;
+        public virtual void Search(ref HashSet<SpaceTimeNode> reservationTable)
+        {
+            var startNode = new SpaceTimeNode(Start.X, Start.Y, 0);
+            _gScore[startNode] = 0;
+            _open.Enqueue(startNode, Heuristic(Start));
+
+            SpaceTimeNode current;
             while (_open.Count > 0)
             {
                 current = _open.Dequeue();
                 _closed.Add(current);
 
-                var time = _time.GetValueOrDefault(current, 0);
-
                 // current tile is reserved, we can't be here
-                if (current != Start && (reservationTable.Contains((current.X, current.Y, time))
-                    || reservationTable.Contains((current.X, current.Y, time + 1))))
+                if (!current.Equals(Start) && (reservationTable.Contains(current)
+                    || reservationTable.Contains(current.Next())))
                 {
                     continue;
                 }
 
-                if (current == Target)
+                if (current.Equals(Target))
                 {
                     Path.AddRange(ReconstructPath(current));
 
                     for (var t = 0; t < Path.Count; t++)
                     {
-                        reservationTable.Add((Path[t].X, Path[t].Y, t));
+                        reservationTable.Add(new SpaceTimeNode(Path[t].X, Path[t].Y, t));
                     }
 
                     return;
                 }
 
-                var added = false;
-                foreach (var neighbor in graph.AdjacentVertices(current))
+                foreach (var neighbor in _graph.GetNeighbours(current))
                 {
                     if (_closed.Contains(neighbor)
-                        || reservationTable.Contains((neighbor.X, neighbor.Y, time))
-                        || reservationTable.Contains((neighbor.X, neighbor.Y, time + 1)))
+                        || reservationTable.Contains(neighbor)
+                        || reservationTable.Contains(neighbor.Next()))
                     {
                         continue;
                     }
 
-                    var tentative_gScore = _gScore.GetValueOrDefault(current, double.PositiveInfinity) + Metrics.Octile(current, neighbor);
+                    var tentative_gScore = _gScore.GetValueOrDefault(current, double.PositiveInfinity) + Cost(current, neighbor);
                     if (tentative_gScore < _gScore.GetValueOrDefault(neighbor, double.PositiveInfinity))
                     {
                         _cameFrom[neighbor] = current;
                         _gScore[neighbor] = tentative_gScore;
-                        _time[neighbor] = time + 1;
-                        added = true;
 
-                        var fScore = tentative_gScore + h(neighbor, Target);
+                        var fScore = tentative_gScore + Heuristic(_graph.GetTile(neighbor));
                         if (!_open.TryUpdatePriority(neighbor, fScore))
                         {
                             _open.Enqueue(neighbor, fScore);
                         }
                     }
                 }
-
-                // wait
-                if (!added)
-                {
-                    _gScore[current] = _gScore.GetValueOrDefault(current, double.PositiveInfinity) + 1;
-                    _open.Enqueue(current, _gScore[current] + h(current, Target));
-                    _closed.Remove(current);
-                    _time[current] = time + 1;
-                    _wait[current] = _wait.GetValueOrDefault(current, 0) + 1;
-                }
             }
         }
 
-        private List<AbstractTile> ReconstructPath(AbstractTile current)
+        protected virtual double Heuristic(AbstractTile p)
         {
-            var path = new List<AbstractTile>() { current };
+            return Metrics.Octile(p, Target);
+        }
 
-            for (var i = 0; i < _wait.GetValueOrDefault(current, 0); i++)
+        private double Cost(SpaceTimeNode p, SpaceTimeNode q)
+        {
+            if (q == p.Next())
             {
-                path.Add(current);
+                return 1;
             }
+
+            return Metrics.Octile(_graph.GetTile(p), _graph.GetTile(q));
+        }
+
+        private List<AbstractTile> ReconstructPath(SpaceTimeNode current)
+        {
+            var path = new List<AbstractTile>() { _graph.GetTile(current) };
 
             while (_cameFrom.TryGetValue(current, out var prev))
             {
                 current = prev;
-                path.Add(current);
+                path.Add(_graph.GetTile(current));
             }
 
             path.Reverse();
