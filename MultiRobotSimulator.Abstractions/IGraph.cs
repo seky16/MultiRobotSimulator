@@ -29,6 +29,8 @@ namespace MultiRobotSimulator.Abstractions
 
         bool IsAdjacentEdgesEmpty(AbstractTile v);
 
+        int RemoveAdjacentEdges(AbstractTile v);
+
         bool RemoveEdge((AbstractTile, AbstractTile) edge);
 
         int RemoveEdges(IEnumerable<(AbstractTile, AbstractTile)> edges);

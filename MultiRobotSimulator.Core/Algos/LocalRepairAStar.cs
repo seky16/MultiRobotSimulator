@@ -21,22 +21,31 @@ namespace MultiRobotSimulator.Core.Algos
 
         public override void RunSearch()
         {
-            System.Threading.Tasks.Parallel.ForEach(Robots, robot =>
+            var lraStarRobots = Robots.Cast<LRAStarRobot>();
+            foreach (var robot in lraStarRobots)
             {
-                ((LRAStarRobot)robot).Search(Graph);
-            });
+                var graph = Graph.Clone();
+                foreach (var neighbor in graph.AdjacentVertices(robot.Start))
+                {
+                    if (lraStarRobots.Any(r => r.Start == neighbor))
+                    {
+                        graph.RemoveAdjacentEdges(neighbor);
+                    }
+                }
+                robot.Search(graph);
+            }
 
-            var enRoute = Robots.Cast<LRAStarRobot>().Where(r => r.Position != null && r.Position != r.Target);
+            var enRoute = lraStarRobots.Where(r => r.Position != null && r.Position != r.Target);
             while (enRoute.Any())
             {
                 foreach (var robot in enRoute)
                 {
                     var next = robot.Step(); // get the next position
-                    if (next != null && enRoute.Any(r => r != robot && r.Position == next))
+                    if (next != null && lraStarRobots.Any(r => r.Position == next))
                     {
                         // occupied - recalculate remainder of the route
                         var graph = Graph.Clone();
-                        graph.RemoveVertex(next);
+                        graph.RemoveAdjacentEdges(next);
                         robot.Search(graph);
                     }
                     else
@@ -45,7 +54,7 @@ namespace MultiRobotSimulator.Core.Algos
                     }
                 }
 
-                enRoute = Robots.Cast<LRAStarRobot>().Where(r => r.Position != null && r.Position != r.Target);
+                enRoute = lraStarRobots.Where(r => r.Position != null && r.Position != r.Target);
             }
         }
     }

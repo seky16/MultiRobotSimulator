@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -354,6 +354,12 @@ namespace MultiRobotSimulator.Core.Models
                 throw GetException(v);
 
             return _wrappedGraph.IsAdjacentEdgesEmpty(tile);
+        }
+
+        public int RemoveAdjacentEdges(AbstractTile v)
+        {
+            var edges = AdjacentEdges(v);
+            return RemoveEdges(edges);
         }
 
         public bool RemoveEdge((AbstractTile, AbstractTile) edge)
