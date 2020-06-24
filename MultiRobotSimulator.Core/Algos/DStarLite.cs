@@ -24,12 +24,12 @@ namespace MultiRobotSimulator.Core.Algos
 
         public override void RunSearch()
         {
-            foreach (var robot in Robots.Cast<DStarRobot>())
+            var dStarRobots = Robots.Cast<DStarRobot>();
+            foreach (var robot in dStarRobots)
             {
                 robot.Initialize(Graph);
             }
 
-            var dStarRobots = Robots.Cast<DStarRobot>();
             var enRoute = dStarRobots.Where(r => r.Position != null && r.Position != r.Target).ToList();
             while (enRoute.Count > 0)
             {

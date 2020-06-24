@@ -1,4 +1,4 @@
-using MultiRobotSimulator.Abstractions;
+﻿using MultiRobotSimulator.Abstractions;
 
 namespace MultiRobotSimulator.Core.Models
 {
