@@ -1,4 +1,18 @@
+\cleardoublepage
 \chapter*{Závěr}
 
 \addcontentsline{toc}{chapter}{Závěr}
 \markboth{ZÁVĚR}{ZÁVĚR}
+
+Cílem této práce bylo popsat problematiku plánování cesty více robotů. První část práce se věnovala popisu navigace robota a jejích součástí -- mapování, tj. zpracování a~reprezentaci prostředí, a plánování cesty, tj. konkrétním metodám. Další část se věnovala popisu vybraných algoritmů používaných pro plánování cesty více robotů ve statickém prostředí. Praktická část práce spočívala v implementaci simulačního prostředí, ve kterém byly poté dané algoritmy otestovány ve čtyřech různých prostředích.
+
+K implementaci bylo vybráno 5 algoritmů -- Local Repair A*, vlastní implementace D* Lite pro více robotů nazvaná Multi Agent D* Lite, Cooperative A* a jeho varianty Hierarchical Cooperative A* a Windowed Hierarchical A*.
+
+Navržené simulační prostředí aplikace umožňuje vytváření, ukládání a načítání map vlastních, případně map ze sady benchmarků MovingAI. Navíc aplikace podporuje jednoduchou implementaci dalších algoritmů pomocí plug-in systému, kdy není potřeba zasahovat do aplikační logiky aplikace. Tohoto lze využít např. ve výuce nebo dalším výzkumu na toto téma.
+
+Algoritmy byly srovnány ve čtyřech experimentech, které se lišily jak velikostí, tak i~topologií mapy. V každém experimentu byl postupně navyšován počet robotů od 1 do 60 a porovnávány následující informace: úspěšnost nalezení cesty všemi roboty, čas běhu algoritmu, průměrný počet expandovaných uzlů na jednoho robota a~průměrná odchylka od optimální délky nalezené cesty.
+
+Algoritmus Local Repair A* je jednoduchý na implementaci, avšak při vyšším počtu robotů dochází k častému přeplánování, tudíž k navýšení počtu expandovaných uzlů a~času potřebného pro běh algoritmu. Navíc dochází k selhání nalezení cest pro všechny roboty. Algoritmus Multi Agent D* Lite byl navržen pro snížení počtu expandovaných uzlů při přeplánování. V tomto je algoritmus úspěšný, ve všech experimentech dosáhl nejmenšího počtu expandovaných uzlů ze všech algoritmů. Stejně jako u Local Repair A* však může dojít k selhání nalezení cesty pro všechny roboty. Navíc jeho základem je nalezení hrany grafu takové, která minimalizuje danou funkci, která je ovšem v této implementaci problematická, tudíž algoritmus nedosahuje takových časů jako ostatní algoritmy. V budoucnosti by se tento problém mohl vyřešit lepší implementací nalezení dané hrany, případně např. paralelizací výpočtu. Cooperative A* se ukázal jako nepraktický, protože expanduje velký počet zbytečných uzlů, což při složitých velkých mapách vede k~obrovskému nárůstu výpočetního času. Hierarchical Cooperative A* řeší tento problém výpočtem odhadu vzdáleností v abstraktním prostoru pomocí Reverse Resumable A* algoritmu. Windowed Hierarchical Cooperative A* dále rozšiřuje abstrakci o zavedení tzv. okna, ve kterém uvažuje ostatní roboty a dále už ne. Oba tyto algoritmy obstály ve všech experimentech, kdy časová náročnost i odchylky od optimální délky cesty byly nejmenší ze všech algoritmů, avšak za cenu většího počtu expandovaných uzlů.
+
+
+

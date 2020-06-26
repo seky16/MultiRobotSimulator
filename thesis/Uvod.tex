@@ -1,4 +1,12 @@
+\cleardoublepage
 \chapter*{Úvod}
 
 \addcontentsline{toc}{chapter}{Úvod}
 \markboth{ÚVOD}{ÚVOD}
+
+V posledních letech dochází díky pokroku v oblasti informačních technologií také k~rozvoji robotiky. Plánování cesty pro více robotů patří mezi jedny z nejdůležitějších problémů, kterými se robotika zabývá. Úkolem systému plánování cesty pro více robotů je nalézt cestu pro každého robota do daného cíle, při které se roboti budou vyhýbat překážkám i sobě navzájem, a zároveň optimalizovat nějakou kriteriální funkci. Použití více robotů s sebou přináší jak výhody, tak nevýhody. Plánování cesty
+ovšem není omezeno pouze na průmyslovou automatizaci, nachází uplatnění v dopravě, zemědělství, armádě ale i v řadě komerčních aplikacích, např. videohrách.
+
+Cílem této diplomové práce je analyzovat a popsat přístupy k plánování cesty pro více mobilních robotů, vybrané metody implementovat a tyto metody poté srovnat pomocí experimentů.
+
+První kapitola se věnuje obecnému popisu navigace robota, konkrétně popisu a zpracování prostředí, formulaci problému plánování cesty pro více robotů a obecnému popisu metod plánování cesty. Druhá kapitola popisuje vybrané algoritmy, které byly vybrány pro implementaci. Jedná se o algoritmy Local Repair A*, Multi Agent D* Lite, Cooperative A*, Hierarchical Cooperative A* a Windowed Hierarchical Cooperative A*. Ve třetí kapitole je popsáno simulační prostředí implementované v programovacím jazyce C\texttt{\#}. V~tomto prostředí byly poté provedeny srovnávací experimenty, které jsou zhodnoceny ve čtvrté kapitole.
