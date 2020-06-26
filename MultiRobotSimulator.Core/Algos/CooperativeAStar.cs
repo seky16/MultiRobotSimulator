@@ -9,7 +9,7 @@ namespace MultiRobotSimulator.Core.Algos
     public class CooperativeAStar : AbstractMultiRobotAlgo
     {
         private HashSet<SpaceTimeNode> _reservationTable;
-        public override string Name => "Cooperative A*";
+        public override string Name => "3 Cooperative A*";
 
         public override void Initialize()
         {

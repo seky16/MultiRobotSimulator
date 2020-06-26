@@ -17,17 +17,12 @@ Supported plugins:
 </Reference>
 ```
 in your `.csproj` file
+
 3. Create new class inheriting from `AbstractSingleRobotAlgo`, `AbstractMultiRobotAlgo` or `IAlgo` (advanced)
-4. Implement required overrides:
+4. Implement overrides: `Initialize`, `RobotFactory`, `RunSearch`
 
-TODO
-
-5. (Optional) Implement optional overrides:
-
-TODO
-
-6. Build your project
-7. Copy built `.dll` to `<appFolder>\plugins`
-8. Run the app. Your algorithm should appear in dropdown
+5. Build your project
+6. Copy built `.dll` to `<appFolder>\plugins`
+7. Run the app. Your algorithm should appear in dropdown
 
 > **Note:** Constructor is only run once (during application startup). Use `Initialize()` for set-up code you need to run before each search.

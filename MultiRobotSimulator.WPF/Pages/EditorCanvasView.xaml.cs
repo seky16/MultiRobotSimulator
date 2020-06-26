@@ -80,12 +80,14 @@ namespace MultiRobotSimulator.WPF.Pages
 
             if (editorAction == EditorAction.Remove)
             {
+                _logger.LogTrace("remove from tile [{x};{y}]", tile.X, tile.Y);
                 _tab.HasChanges |= _tab.Map.RemoveFromTile(tile);
             }
 
             if (editorAction == EditorAction.Add)
             {
                 var drawingMode = _rootVM.DrawingMode;
+                _logger.LogTrace("set tile [{x};{y}] as {drawingMode}", tile.X, tile.Y, drawingMode.ToString());
                 _tab.HasChanges |= _tab.Map.AddToTile(tile, drawingMode);
             }
 
@@ -205,13 +207,13 @@ namespace MultiRobotSimulator.WPF.Pages
 
         private void RenderPaths(DrawingContext drawingContext)
         {
-            var paths = _rootVM?.AlgoResult?.Paths;
-            if (paths is null || paths.Count == 0)
+            var paths = _rootVM?.AlgoResult?.Robots.Where(r => r.Success).Select(r => r.Path);
+            if (paths is null || !paths.Any())
             {
                 return;
             }
 
-            for (var p = 0; p < paths.Count; p++)
+            for (var p = 0; p < paths.Count(); p++)
             {
                 var path = paths.ElementAt(p);
                 if (path.Count == 0)
@@ -228,7 +230,7 @@ namespace MultiRobotSimulator.WPF.Pages
 
                 geometry.Freeze();
 
-                drawingContext.DrawGeometry(null, new Pen(DistinctColors.GetBrush(p), LineWidth*3), geometry);
+                drawingContext.DrawGeometry(null, new Pen(DistinctColors.GetBrush(p), LineWidth * 3), geometry);
             }
         }
 
@@ -334,7 +336,7 @@ namespace MultiRobotSimulator.WPF.Pages
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            _logger.LogDebug("DataContextChanged: '{newContext}'", e.NewValue);
+            _logger.LogTrace("DataContextChanged: '{newContext}'", e.NewValue);
 
             if (e.NewValue is EditorCanvasViewModel editorCanvasViewModel)
             {

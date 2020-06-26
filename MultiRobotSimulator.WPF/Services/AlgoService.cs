@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -47,6 +47,8 @@ namespace MultiRobotSimulator.WPF.Services
                     robots.Add(algo.RobotFactory(graph.Starts[i], graph.Targets[i]));
                 }
 
+                _logger.LogInformation("Robots={robots}", robots.Count);
+
                 algo.InitializeInternal(graph.Clone(), robots);
                 var initTime = sw.ElapsedMilliseconds;
                 _logger.LogInformation("{action} took {ms} ms", "init", initTime);
@@ -56,7 +58,7 @@ namespace MultiRobotSimulator.WPF.Services
                 sw.Stop();
                 _logger.LogInformation("{action} took {ms} ms", "search", sw.ElapsedMilliseconds);
 
-                var result = new AlgoResult(algo, initTime, sw.ElapsedMilliseconds);
+                var result = new AlgoResult(graph, algo, initTime, sw.ElapsedMilliseconds);
 
                 _eventAggregator.Publish(new SearchDoneEvent(result));
             }

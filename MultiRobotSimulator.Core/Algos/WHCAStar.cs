@@ -10,7 +10,7 @@ namespace MultiRobotSimulator.Core.Algos
     public class WHCAStar : AbstractMultiRobotAlgo
     {
         private HashSet<SpaceTimeNode> _reservationTable;
-        public override string Name => "WHCA*";
+        public override string Name => "5 WHCA*";
 
         public override void Initialize()
         {

@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 using System.Collections.Generic;
 using MultiRobotSimulator.Abstractions;
@@ -89,6 +89,7 @@ namespace MultiRobotSimulator.Core.Models
         {
             if (q == p.Next())
             {
+                // wait node
                 return 1;
             }
 

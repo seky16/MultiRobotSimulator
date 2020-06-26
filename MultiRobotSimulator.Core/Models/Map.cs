@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -56,10 +56,11 @@ namespace MultiRobotSimulator.Core.Models
             }
         }
 
-        private Map(int width, int height, UndirectedGraph<Tile, SEdge<Tile>> wrappedGraph)
+        private Map(int width, int height, UndirectedGraph<Tile, SEdge<Tile>> wrappedGraph, Dictionary<(int, int), AbstractTile> tileCache)
         {
             Width = width;
             Height = height;
+            _tileCache = tileCache;
             _wrappedGraph = wrappedGraph.Clone();
         }
 
@@ -310,7 +311,7 @@ namespace MultiRobotSimulator.Core.Models
 
         public IGraph Clone()
         {
-            return new Map(Width, Height, _wrappedGraph);
+            return new Map(Width, Height, _wrappedGraph, _tileCache);
         }
 
         public bool ContainsEdge(AbstractTile source, AbstractTile target)
@@ -320,19 +321,12 @@ namespace MultiRobotSimulator.Core.Models
             if (!(target is Tile tTarget))
                 throw GetException(target);
 
-            return _wrappedGraph.ContainsEdge(tSource, tTarget);
+            return _wrappedGraph.ContainsEdge(tSource, tTarget) || _wrappedGraph.ContainsEdge(tTarget, tSource);
         }
 
         public bool ContainsEdge((AbstractTile, AbstractTile) edge)
         {
-            if (!(edge.Item1 is Tile source))
-                throw GetException(edge.Item1);
-
-            if (!(edge.Item2 is Tile target))
-                throw GetException(edge.Item2);
-
-            var tEdge = new SEdge<Tile>(source, target);
-            return _wrappedGraph.ContainsEdge(tEdge);
+            return ContainsEdge(edge.Item1, edge.Item2);
         }
 
         public bool ContainsVertex(AbstractTile v)

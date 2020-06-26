@@ -8,7 +8,7 @@ namespace MultiRobotSimulator.Core.Algos
 {
     public class LocalRepairAStar : AbstractMultiRobotAlgo
     {
-        public override string Name => "Local Repair A*";
+        public override string Name => "1 Local Repair A*";
 
         public override void Initialize()
         {

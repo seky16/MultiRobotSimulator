@@ -89,9 +89,9 @@
                                     <CheckBox IsChecked="{Binding RenderPaths}">Render paths</CheckBox>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Margin="2">Found paths:</TextBlock>
-                                        <TextBlock Margin="2" DataContext="{Binding AlgoResult}" Text="{Binding Path=Succesful}" />
+                                        <TextBlock Margin="2" DataContext="{Binding AlgoResult}" Text="{Binding Path=Successful}" />
                                         <TextBlock Margin="2">/</TextBlock>
-                                        <TextBlock Margin="2" DataContext="{Binding AlgoResult}" Text="{Binding Path=Paths.Count}" />
+                                        <TextBlock Margin="2" DataContext="{Binding AlgoResult}" Text="{Binding Path=Robots.Count}" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Margin="2">Init time:</TextBlock>
@@ -105,7 +105,11 @@
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Margin="2">Shortest path length:</TextBlock>
-                                        <TextBlock Margin="2" DataContext="{Binding AlgoResult}" Text="{Binding Path=ShortestPathLength}" />
+                                        <TextBlock Margin="2" DataContext="{Binding AlgoResult}" Text="{Binding Path=ShortestPathLength, StringFormat=N2}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Margin="2">Average path length:</TextBlock>
+                                        <TextBlock Margin="2" DataContext="{Binding AlgoResult}" Text="{Binding Path=AveragePathLength, StringFormat=N2}" />
                                     </StackPanel>
                                 </StackPanel>
                             </GroupBox>

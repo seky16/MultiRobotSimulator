@@ -6,7 +6,7 @@
 
         public CanvasRedrawEvent()
         {
-            _logger.Debug("{event} called", nameof(CanvasRedrawEvent));
+            _logger.Trace("{event} called", nameof(CanvasRedrawEvent));
         }
     }
 }

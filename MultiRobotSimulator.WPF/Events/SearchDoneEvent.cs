@@ -8,7 +8,7 @@ namespace MultiRobotSimulator.WPF.Events
 
         public SearchDoneEvent(AlgoResult result)
         {
-            _logger.Debug("{event} called", nameof(SearchDoneEvent));
+            _logger.Trace("{event} called", nameof(SearchDoneEvent));
             Result = result;
         }
 

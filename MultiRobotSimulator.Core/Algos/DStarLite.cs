@@ -11,7 +11,7 @@ namespace MultiRobotSimulator.Core.Algos
 {
     public class DStarLite : AbstractMultiRobotAlgo
     {
-        public override string Name => "D* Lite";
+        public override string Name => "2 D* Lite";
 
         public override void Initialize()
         {

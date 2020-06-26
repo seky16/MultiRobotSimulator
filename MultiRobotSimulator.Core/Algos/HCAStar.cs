@@ -9,7 +9,7 @@ namespace MultiRobotSimulator.Core.Algos
     public class HCAStar : AbstractMultiRobotAlgo
     {
         private HashSet<SpaceTimeNode> _reservationTable;
-        public override string Name => "Hierarchical Cooperative A*";
+        public override string Name => "4 Hierarchical Cooperative A*";
 
         public override void Initialize()
         {

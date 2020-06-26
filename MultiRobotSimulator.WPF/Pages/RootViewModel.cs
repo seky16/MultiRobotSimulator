@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -59,17 +59,17 @@ namespace MultiRobotSimulator.WPF.Pages
         {
             get
             {
-                if (_algoResults.TryGetValue(ActiveItem, out var result))
+                if (ActiveItem != null && _algoResults.TryGetValue(ActiveItem, out var result))
                 {
-                    _logger.LogDebug("AlgoResult get {result}", result);
+                    _logger.LogTrace("AlgoResult get {result}", result);
                     return result;
                 }
-                _logger.LogDebug("AlgoResult get {result}", null);
+                _logger.LogTrace("AlgoResult get {result}", null);
                 return null;
             }
             set
             {
-                _logger.LogDebug("AlgoResult set {result}", value);
+                _logger.LogTrace("AlgoResult set {result}", value);
                 _algoResults[ActiveItem] = value;
                 NotifyOfPropertyChange(nameof(AlgoResult));
                 NotifyOfPropertyChange(nameof(HasAlgoResult));
@@ -90,7 +90,7 @@ namespace MultiRobotSimulator.WPF.Pages
             get
             {
                 var foo = _algoResults.TryGetValue(ActiveItem, out var result) && result != null;
-                _logger.LogDebug("HasAlgoResult {result}", foo);
+                _logger.LogTrace("HasAlgoResult {result}", foo);
                 return foo;
             }
         }
@@ -150,6 +150,7 @@ namespace MultiRobotSimulator.WPF.Pages
         {
             _logger.LogInformation("Clearing robots on '{displayName}'", ActiveItem.DisplayName);
 
+            ActiveItem.Map.ClearRobots();
             AlgoResult = null;
             _eventAggregator.Publish(new CanvasRedrawEvent());
         }
