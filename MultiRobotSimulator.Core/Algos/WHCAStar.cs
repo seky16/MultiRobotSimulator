@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +18,7 @@ namespace MultiRobotSimulator.Core.Algos
             var spaceTimeGraph = new SpaceTimeGraph(Graph);
             foreach (WHCAStarRobot robot in Robots)
             {
-                robot.Initialize(spaceTimeGraph, 3);
+                robot.Initialize(spaceTimeGraph, 16);
                 _reservationTable.Add(new SpaceTimeNode(robot.Start.X, robot.Start.Y, 0));
             }
         }
