@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 ### Removed
 
+## [1.0.0] (2020-06-27)
+### Added
+- Clear Robots button
+- `RobotFactory`
+- Multi Agent D* Lite implementation
+- Windowed Hierarchical Cooperative A* implementation [[Silver](https://www.davidsilver.uk/wp-content/uploads/2020/01/coop-path-AIIDE.pdf)]
+- `SpaceTimeGraph` for CA*, HCA* and WHCA*
+### Changed
+- Faster rendering using `StreamGeometry`
+- Add initial positions to reservation table in CA* and HCA*
+- Fix tile cache not working for cloned graphs
+- Update Stylet to 1.3.3
+- Better `AlgoResult` path validation and info
+- Change log verbosity for several calls
+
 ## [0.7.0] (2020-06-17)
 ### Added
 - [Octile metric](https://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html#diagonal-distance)
@@ -73,7 +88,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Drawing obstacles/starts/finishes
 
 
-[Unreleased]: https://github.com/seky16/MultiRobotSimulator/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/seky16/MultiRobotSimulator/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/seky16/MultiRobotSimulator/compare/v0.7.0...v1.0.0
 [0.7.0]: https://github.com/seky16/MultiRobotSimulator/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/seky16/MultiRobotSimulator/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/seky16/MultiRobotSimulator/compare/v0.4.0...v0.5.0

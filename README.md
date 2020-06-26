@@ -21,3 +21,5 @@ Code for diploma thesis *Path planning for multiple robots*.
     - [x] Local Repair A* [[Silver](https://www.davidsilver.uk/wp-content/uploads/2020/01/coop-path-AIIDE.pdf)]
     - [x] Cooperative A* [[Silver](https://www.davidsilver.uk/wp-content/uploads/2020/01/coop-path-AIIDE.pdf)]
     - [x] Hierarchical Cooperative A* [[Silver](https://www.davidsilver.uk/wp-content/uploads/2020/01/coop-path-AIIDE.pdf)]
+    - [x] Windowed Hierarchical Cooperative A* [[Silver](https://www.davidsilver.uk/wp-content/uploads/2020/01/coop-path-AIIDE.pdf)]
+  - [x] Multi Agent D* Lite 
