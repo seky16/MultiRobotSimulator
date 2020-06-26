@@ -76,16 +76,12 @@
                                     </StackPanel>
                                 </GroupBox>
                                 <Border BorderThickness="3" BorderBrush="Transparent" />
-                                <CheckBox IsChecked="{Binding RenderGraph}">Render graph (debug)</CheckBox>
+                                <CheckBox IsChecked="{Binding RenderGraph}">Render graph</CheckBox>
                             </WrapPanel>
                         </Border>
                     </TabItem>
                     <TabItem Header="Search">
                         <StackPanel Orientation="Vertical"  IsEnabled="{Binding HasOpenTabs}">
-                            <!--<TextBlock>* C#</TextBlock>
-                            <TextBlock>* Python ?</TextBlock>
-                            <TextBlock>* Lua ?</TextBlock>
-                            <TextBlock>* JS ?</TextBlock>-->
                             <ComboBox Margin="4" ItemsSource="{Binding Algos}" DisplayMemberPath="Value" SelectedValuePath="Key" SelectedValue="{Binding SelectedAlgo, Mode=TwoWay}"></ComboBox>
                             <Button Margin="4" Click="{s:Action RunSearch}">Run search</Button>
                             <GroupBox Header="Results" Visibility="{Binding HasAlgoResult, Converter={x:Static s:BoolToVisibilityConverter.Instance}}" IsEnabled="{Binding HasAlgoResult}">
@@ -107,11 +103,6 @@
                                         <TextBlock Margin="2" DataContext="{Binding AlgoResult}" Text="{Binding Path=SearchTime, StringFormat=N2}" />
                                         <TextBlock Margin="2">ms</TextBlock>
                                     </StackPanel>
-                                    <!--<StackPanel Orientation="Horizontal">
-                                        <TextBlock Margin="2">Average time:</TextBlock>
-                                        <TextBlock Margin="2" DataContext="{Binding AlgoResult}" Text="{Binding Path=AverageSearchTime, StringFormat=N2}" />
-                                        <TextBlock Margin="2">ms</TextBlock>
-                                    </StackPanel>-->
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Margin="2">Shortest path length:</TextBlock>
                                         <TextBlock Margin="2" DataContext="{Binding AlgoResult}" Text="{Binding Path=ShortestPathLength}" />

@@ -228,7 +228,7 @@ namespace MultiRobotSimulator.WPF.Pages
 
                 geometry.Freeze();
 
-                drawingContext.DrawGeometry(null, new Pen(DistinctColors.GetBrush(p), LineWidth), geometry);
+                drawingContext.DrawGeometry(null, new Pen(DistinctColors.GetBrush(p), LineWidth*3), geometry);
             }
         }
 
